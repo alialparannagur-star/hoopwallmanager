@@ -63,6 +63,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:var(--panel2)}
 <div id="toast"></div>
 <script>
 
+
 /* ================= DİL ================= */
 let LANG=(()=>{try{const s=localStorage.getItem('hw_lang');if(s)return s}catch(e){}
   let tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){}
@@ -152,7 +153,7 @@ function ovrTag(o){const c=o>=80?'#ff7a1a':o>=70?'#2ecc71':o>=60?'#4aa3ff':o>=50
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
 const flag=ci=>COUNTRIES[ci].flag;
 
-let G=null,UI={lv:'country',sqv:'gen',tmv:'gen',tmId:null,tab:'panel',lc:0,ll:0,cc:null,round:null,faPos:'',faC:'',startC:null,startL:6};
+let G=null,UI={live:(()=>{try{return localStorage.getItem('hw_live')!=='0'}catch(e){return true}})(),lv:'country',sqv:'gen',tmv:'gen',tmId:null,tab:'panel',lc:0,ll:0,cc:null,round:null,faPos:'',faC:'',startC:null,startL:6};
 
 /* Kayıt: IndexedDB */
 const DB={db:null,
@@ -379,7 +380,7 @@ function render(){
   <main>${({panel,kadro,tesis,dunya,lig,kupa,fikstur,intl,transfer,haber,nasil})[UI.tab]()}</main>`;
 }
 function langBtn(){return `<button class="sm" onclick="setLang('${LANG==='tr'?'en':'tr'}')" title="Language">${LANG==='tr'?'🇬🇧 English':'🇹🇷 Türkçe'}</button>`}
-function go(n){if(n===0)endSeason();else for(let i=0;i<n&&G.day<DAYS;i++)playDay();save();render();window.scrollTo(0,0)}
+function go(n){if(n===0)endSeason();else for(let i=0;i<n&&G.day<DAYS;i++)playDay();save();render();if(n===1&&UI.live&&G.boxes.length)openLive(G.boxes[0],G.boxes.slice(1));window.scrollTo(0,0)}
 const teamLink=t=>`<a href="#" onclick="openTeam(${t.id});return false" style="color:inherit">${esc(t.name)}</a>`;
 const formHtml=f=>f.map(x=>x==='W'?`<span class="grt">${L('G','W')}</span>`:`<span class="rdt">${L('M','L')}</span>`).join(' ');
 function todayMatches(){
@@ -395,7 +396,7 @@ function panel(){
   const exp=U.p.filter(id=>G.P[id].c===1).length,pay=payroll(U),inc=income(U);
   const boxHtml=G.boxes.length?G.boxes.map(id=>{const b=G.bx[id];if(!b)return '';const mine=b.h===G.user?b.bh:b.ba,won=(b.h===G.user)===(b.hs>b.as),top=mine.slice().sort((x,y)=>y[2]-x[2])[0],tp=G.P[top[0]];
     return `<div style="margin-bottom:12px"><div class="mut">${MODE_N()[b.mode]} · ${L('Gün','Day')} ${b.day}</div><div class="big ${won?'grt':'rdt'}">${b.hs} – ${b.as}${b.ot?' <span class="pill">'+L('UZ','OT')+'</span>':''}</div><div>${esc(G.teams[b.h].name)} vs ${esc(G.teams[b.a].name)}</div>
-    ${tp?`<div class="mut">⭐ ${esc(tp.n)}: ${top[2]} ${L('sayı','pts')}, ${top[3]} ${L('rib','reb')}, ${top[4]} ${L('ast','ast')}</div>`:''}<button class="sm" style="margin-top:6px" onclick="openBox(${id})">📊 ${L('Maç istatistikleri','Box score')}</button></div>`}).join(''):`<p class="mut">${L('Henüz maç oynanmadı. Üstteki ▶ Günü Oynat ile başla.','No games played yet. Press ▶ Play Day above.')}</p>`;
+    ${tp?`<div class="mut">⭐ ${esc(tp.n)}: ${top[2]} ${L('sayı','pts')}, ${top[3]} ${L('rib','reb')}, ${top[4]} ${L('ast','ast')}</div>`:''}<button class="sm" style="margin-top:6px" onclick="openLive(${id})">▶ ${L('Canlı izle','Watch')}</button> <button class="sm" style="margin-top:6px" onclick="openBox(${id})">📊 ${L('Maç istatistikleri','Box score')}</button></div>`}).join(''):`<p class="mut">${L('Henüz maç oynanmadı. Üstteki ▶ Günü Oynat ile başla.','No games played yet. Press ▶ Play Day above.')}</p>`;
   return `<div class="grid">
   <div class="card"><h3>${L('Takımın','Your Team')}</h3><div class="row"><span style="font-size:40px">${flag(U.c)}</span><div><h2 style="margin:0">${esc(U.name)}</h2><div class="mut">${cn(U.c)} · ${lgName(U.l)}</div></div></div>
    <div class="row" style="margin-top:12px"><span class="pill">${L('Sıra','Rank')}: <b>${pos}.</b></span><span class="pill">${U.w}${L('G','W')} – ${U.lo}${L('M','L')}</span><span class="pill">${L('Güç','Rating')}: <b>${rating(U).toFixed(1)}</b></span><span class="pill">Form: ${formHtml(U.form)||'–'}</span></div>
@@ -408,7 +409,7 @@ function panel(){
    <tr><td>${L('Galibiyet primi','Win bonus')}</td><td class="num">+${money(Math.round(inc*.5))}</td></tr></table>
    ${U.p.length<12?`<p class="rdt">⚠️ ${L(`Kadronda sadece ${U.p.length} oyuncu var. Transfer veya altyapıdan takviye yap.`,`Only ${U.p.length} players on your roster. Sign or promote players.`)}</p>`:''}
    ${exp?`<p class="rdt">⚠️ ${L(`${exp} oyuncunun sözleşmesi bu sezon bitiyor. Kadro sekmesinden uzatabilirsin.`,`${exp} contracts expire this season. Extend them in the Squad tab.`)}</p>`:''}</div>
-  <div class="card"><h3>${L('Bugünkü maçlar','Today\'s Games')}</h3>${tm.length?tm.map(m=>`<div style="margin-bottom:10px"><span class="pill">${m.type}</span> ${m.home?'🏠':'✈️'} vs ${teamLink(m.opp)} <span class="mut">(${LEAGUES[m.opp.l].k} · ${L('güç','rating')} ${rating(m.opp).toFixed(1)})</span></div>`).join(''):`<p>${L('Sezon bitti. <b>Sezonu Tamamla</b> ile devam et.','Season over. Press <b>Finish Season</b>.')}</p>`}
+  <div class="card"><h3>${L('Bugünkü maçlar','Today\'s Games')}</h3><label class="row" style="margin-bottom:10px;cursor:pointer"><input type="checkbox" ${UI.live?'checked':''} onchange="UI.live=this.checked;try{localStorage.setItem('hw_live',this.checked?'1':'0')}catch(e){}"> ${L('▶ Günü Oynat\'a basınca maçlarımı canlı izle','Watch my games live when I press ▶ Play Day')}</label>${tm.length?tm.map(m=>`<div style="margin-bottom:10px"><span class="pill">${m.type}</span> ${m.home?'🏠':'✈️'} vs ${teamLink(m.opp)} <span class="mut">(${LEAGUES[m.opp.l].k} · ${L('güç','rating')} ${rating(m.opp).toFixed(1)})</span></div>`).join(''):`<p>${L('Sezon bitti. <b>Sezonu Tamamla</b> ile devam et.','Season over. Press <b>Finish Season</b>.')}</p>`}
    <p class="mut">${L('Gerçek oyunda maçlar her gün sabit saatte otomatik oynanacak. Prototipte günü sen ilerletiyorsun.','In the live game, matches will play automatically at a fixed time each day. In this prototype you advance the day.')}</p></div>
   <div class="card"><h3>${L('Son maçlar','Latest Results')}</h3>${boxHtml}</div>
   <div class="card"><h3>${L('Son haberler','Latest News')}</h3><ul class="news">${G.news.slice(0,8).map(n=>`<li>${newsText(n)}</li>`).join('')}</ul></div></div>`;
@@ -600,9 +601,106 @@ function openBox(id){
     ${lines.map(l=>{const p=G.P[l[0]];return `<tr><td>${p?pName(p)+' <span class="mut">'+p.pos+'</span>':'<span class="mut">—</span>'}</td><td class="num">${l[1]}</td><td class="num"><b>${l[2]}</b></td><td class="num">${l[3]}</td><td class="num">${l[4]}</td><td class="num">${l[5]}</td><td class="num">${l[6]}</td><td class="num">${l[7]}</td><td class="num">${l[8]}-${l[9]}</td><td class="num">${l[8]-l[10]}-${l[9]-l[11]}</td><td class="num">${l[10]}-${l[11]}</td><td class="num">${l[12]}-${l[13]}</td></tr>`}).join('')}
     <tr style="font-weight:600"><td>${L('Toplam','Totals')}</td><td></td><td class="num">${tot[0]}</td><td class="num">${tot[1]}</td><td class="num">${tot[2]}</td><td class="num">${tot[3]}</td><td class="num">${tot[4]}</td><td class="num">${tot[5]}</td><td class="num">${pct(tot[6],tot[7])}</td><td class="num">${pct(tot[6]-tot[8],tot[7]-tot[9])}</td><td class="num">${pct(tot[8],tot[9])}</td><td class="num">${pct(tot[10],tot[11])}</td></tr></table></div>`};
   showModal(`<div class="row" style="justify-content:space-between"><div><div class="mut">${MODE_N()[b.mode]} · ${L('Gün','Day')} ${b.day}</div><h2 style="margin:0">${esc(G.teams[b.h].name)} <span class="or">${b.hs} – ${b.as}</span> ${esc(G.teams[b.a].name)}${b.ot?' <span class="pill">'+L('UZ','OT')+'</span>':''}</h2></div>${closeBtn()}</div>
+   <div class="row" style="margin-top:8px"><button class="pri" onclick="openLive(${id})">▶ ${L('Maçı canlı izle','Watch the game')}</button></div>
+   ${(()=>{const per=buildPBP(b,id).per;return `<div class="scroll" style="margin-top:8px"><table><tr><th></th>${per.map((_,q)=>`<th class="num">${q<4?L('Ç','Q')+(q+1):L('UZ','OT')+(q-3)}</th>`).join('')}<th class="num">${L('Top','Tot')}</th></tr>${[b.h,b.a].map((t,si)=>`<tr><td>${esc(G.teams[t].name)}</td>${per.map(x=>`<td class="num">${x[si]}</td>`).join('')}<td class="num"><b>${si?b.as:b.hs}</b></td></tr>`).join('')}</table></div>`})()}
    ${tbl(b.h,b.bh,b.hs)}${tbl(b.a,b.ba,b.as)}`);
 }
-function closeModal(){const o=document.getElementById('ov');if(o)o.remove()}
+/* ================= CANLI MAÇ ================= */
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function buildPBP(b,seed){
+  const R=mulberry(seed*7919+13),ri=(x,y)=>x+Math.floor(R()*(y-x+1)),sh=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  const sides=[b.bh,b.ba],ev=[],pool=(lines,idx)=>{const a=[];lines.forEach(l=>{for(let k=0;k<l[idx];k++)a.push(l[0])});return sh(a)};
+  sides.forEach((lines,si)=>{const opp=sides[1-si],mine=[];
+    lines.forEach(l=>{const p=l[0],m3=l[10],a3=l[11],m2=l[8]-l[10],a2=l[9]-l[11];
+      for(let k=0;k<m3;k++)mine.push({s:si,t:'3m',p});for(let k=0;k<a3-m3;k++)mine.push({s:si,t:'3x',p});
+      for(let k=0;k<m2;k++)mine.push({s:si,t:'2m',p});for(let k=0;k<a2-m2;k++)mine.push({s:si,t:'2x',p});
+      let left=l[13],made=l[12];while(left>0){const n=left>=2&&R()<.85?2:1,mk=ri(Math.max(0,made-(left-n)),Math.min(n,made));mine.push({s:si,t:'ft',p,n,mk});left-=n;made-=mk}
+      for(let k=0;k<l[7];k++)mine.push({s:si,t:'to',p})});
+    sh(mine);
+    const ast=pool(lines,4),stl=pool(opp,5),blk=pool(opp,6);
+    mine.forEach(e=>{
+      if((e.t==='3m'||e.t==='2m')&&ast.length&&R()<.75){const k=ast.findIndex(x=>x!==e.p);if(k>=0)e.a=ast.splice(k,1)[0]}
+      if(e.t==='to'&&stl.length)e.st=stl.pop();
+      if((e.t==='2x'||e.t==='3x')&&blk.length&&R()<(e.t==='2x'?.3:.08))e.bl=blk.pop()});
+    ev.push(...mine)});
+  // ribauntlar
+  const rp=[pool(sides[0],3),pool(sides[1],3)];
+  ev.forEach(e=>{const miss=e.t==='2x'||e.t==='3x'||(e.t==='ft'&&e.mk<e.n&&R()<.6);if(!miss)return;
+    let side=R()<.73?1-e.s:e.s;if(!rp[side].length)side=1-side;if(rp[side].length){e.r=rp[side].pop();e.rs=side}});
+  // zaman
+  const T=(48+5*b.ot)*60;ev.forEach(e=>{e.tm=Math.floor(R()*T);e.v=ri(0,9)});ev.sort((x,y)=>x.tm-y.tm);
+  // skor + çeyrekler
+  const qEnd=q=>q<4?(q+1)*720:2880+(q-3)*300,nQ=4+b.ot,qs=[];let sc=[0,0],q=0;const out=[];
+  ev.forEach(e=>{while(q<nQ-1&&e.tm>=qEnd(q)){qs.push(sc.slice());out.push({t:'q',q,sc:sc.slice(),tm:qEnd(q)});q++}
+    const pts=e.t==='3m'?3:e.t==='2m'?2:e.t==='ft'?e.mk:0;sc[e.s]+=pts;e.sc=sc.slice();e.pts=pts;out.push(e)});
+  while(q<nQ){qs.push(sc.slice());out.push({t:'q',q,sc:sc.slice(),tm:qEnd(q),end:q===nQ-1});q++}
+  const per=qs.map((s,i)=>i?[s[0]-qs[i-1][0],s[1]-qs[i-1][1]]:s);
+  return {ev:out,per};
+}
+const pn=id=>{const p=G.P[id];return p?p.n:'—'};
+const qName=q=>q<4?L(`${q+1}. çeyrek`,`Q${q+1}`):L(`${q-3}. uzatma`,`OT${q-3}`);
+function clockOf(tm){let q,base,len;if(tm<2880){q=Math.floor(tm/720);base=q*720;len=720}else{q=4+Math.floor((tm-2880)/300);base=2880+(q-4)*300;len=300}
+  const r=len-(tm-base),m=Math.floor(r/60),s=r%60;return {q,txt:`${m}:${String(s).padStart(2,'0')}`}}
+function evText(e,b){
+  const P=`<b>${esc(pn(e.p))}</b>`,A=e.a!=null?L(` (${esc(pn(e.a))} asist)`,` (assist: ${esc(pn(e.a))})`):'',v=e.v,jmp=G.P[e.p]?G.P[e.p].at[AI.JMP]:50;
+  const reb=e.r!=null?(e.rs===e.s?L(` Hücum ribauntu: ${esc(pn(e.r))}.`,` Offensive board: ${esc(pn(e.r))}.`):L(` Ribaunt ${esc(pn(e.r))}.`,` Rebound ${esc(pn(e.r))}.`)):'';
+  const T3m=[L(`${P} üçlük çizgisinin gerisinden… FİLELER!`,`${P} from downtown… BANG!`),L(`${P} köşeden üçlüğü buldu!`,`${P} hits the corner three!`),L(`${P} adamını geçti, üçlük… isabet!`,`${P} steps back for three… good!`),L(`${P} uzaktan denedi ve sayıyı buldu!`,`${P} buries it from deep!`)];
+  const T3x=[L(`${P} üçlük denedi, çemberden döndü.`,`${P} misses from three.`),L(`${P} uzaktan attı, olmadı.`,`${P} long-range attempt is off.`),L(`${P} üçlüğü kısa kaldı.`,`${P} comes up short from three.`)];
+  const T2m=jmp>=72&&v<3?[L(`${P} çembere yükseldi… SMAÇ!`,`${P} rises up… SLAM DUNK!`)]:[L(`${P} potaya girdi ve bitirdi.`,`${P} drives and finishes at the rim.`),L(`${P} orta mesafeden isabet.`,`${P} knocks down the mid-range jumper.`),L(`${P} turnike, sayı!`,`${P} lays it in!`),L(`${P} pota altında dönüp attı, sayı.`,`${P} spins in the post and scores.`),L(`${P} çizginin hemen içinden pull-up, isabet.`,`${P} pull-up jumper, good.`)];
+  const T2x=[L(`${P} pota altında kaçırdı.`,`${P} misses inside.`),L(`${P} orta mesafeden attı, olmadı.`,`${P} misses the jumper.`),L(`${P} turnikeyi kaçırdı.`,`${P} can't finish the layup.`)];
+  switch(e.t){
+    case '3m':return T3m[v%T3m.length]+A+' <span class="or">+3</span>';
+    case '3x':return T3x[v%T3x.length]+reb;
+    case '2m':return T2m[v%T2m.length]+A+' <span class="or">+2</span>';
+    case '2x':return (e.bl!=null?L(`${P} potaya gitti… <b>${esc(pn(e.bl))}</b> BLOKLADI! 🚫`,`<b>${esc(pn(e.bl))}</b> BLOCKS ${P}! 🚫`):T2x[v%T2x.length])+reb;
+    case 'ft':return L(`${P} serbest atış çizgisinde: ${e.n}'de ${e.mk}.`,`${P} at the line: ${e.mk} of ${e.n}.`)+(e.mk?` <span class="or">+${e.mk}</span>`:'')+(e.mk<e.n?reb:'');
+    case 'to':return e.st!=null?L(`${P} topu kaptırdı, <b>${esc(pn(e.st))}</b> çaldı! 🔥`,`<b>${esc(pn(e.st))}</b> picks ${P}'s pocket! 🔥`):[L(`${P} top kaybetti.`,`${P} turns it over.`),L(`${P} pas hatası yaptı.`,`${P} bad pass, turnover.`),L(`${P} adım hatası.`,`${P} called for travelling.`)][v%3];
+  }
+  return '';
+}
+let LIVE=null;
+function liveStop(){if(LIVE&&LIVE.timer){clearInterval(LIVE.timer);LIVE.timer=null}}
+function openLive(id,queue){
+  const b=G.bx[id];if(!b)return;liveStop();const pb=buildPBP(b,id),H=G.teams[b.h],A=G.teams[b.a];
+  LIVE={id,queue:queue||[],pb,i:0,speed:LIVE?LIVE.speed:1,timer:null,b};
+  showModal(`<div class="row" style="justify-content:space-between"><div class="mut">🔴 ${L('CANLI','LIVE')} · ${MODE_N()[b.mode]} · ${L('Gün','Day')} ${b.day}</div><button onclick="liveStop();closeModal()">✕</button></div>
+   <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:10px 0;text-align:center">
+    <div><div style="font-size:30px">${flag(H.c)}</div><b>${esc(H.name)}</b><div class="mut" style="font-size:12px">${L('Ev sahibi','Home')}</div></div>
+    <div><div class="big" id="lvsc" style="font-size:52px">0 – 0</div><div id="lvclk" class="or" style="font-weight:600">${qName(0)} · 12:00</div></div>
+    <div><div style="font-size:30px">${flag(A.c)}</div><b>${esc(A.name)}</b><div class="mut" style="font-size:12px">${L('Deplasman','Away')}</div></div></div>
+   <div id="lvq" class="scroll"></div>
+   <div class="row" style="margin:10px 0"><button id="lvpp" class="pri" onclick="liveToggle()">⏸ ${L('Duraklat','Pause')}</button>
+    ${[1,3,10].map(x=>`<button class="sm lvsp ${x===LIVE.speed?'pri':''}" data-x="${x}" onclick="liveSpeed(${x})">${x}x</button>`).join('')}
+    <button class="sm" onclick="liveSkip()">⏭ ${L('Sonuca atla','Skip to end')}</button></div>
+   <div id="lvfeed" style="max-height:340px;overflow:auto;border-top:1px solid var(--line)"></div>
+   <div id="lvend" style="margin-top:10px"></div>`);
+  liveQuarters();liveRun();
+}
+function liveRun(){liveStop();LIVE.timer=setInterval(liveStep,[0,700,0,230,0,0,0,0,0,0,70][LIVE.speed]||700)}
+function liveToggle(){const b=document.getElementById('lvpp');if(LIVE.timer){liveStop();if(b)b.innerHTML='▶ '+L('Devam','Resume')}else if(LIVE.i<LIVE.pb.ev.length){liveRun();if(b)b.innerHTML='⏸ '+L('Duraklat','Pause')}}
+function liveSpeed(x){LIVE.speed=x;document.querySelectorAll('.lvsp').forEach(e=>e.classList.toggle('pri',+e.dataset.x===x));if(LIVE.timer)liveRun()}
+function liveSkip(){liveStop();while(LIVE.i<LIVE.pb.ev.length)liveStep(true);liveStep(true)}
+function liveQuarters(){const el=document.getElementById('lvq');if(!el)return;const b=LIVE.b,per=LIVE.pb.per,done=LIVE.pb.ev.slice(0,LIVE.i).filter(e=>e.t==='q').length;
+  const cell=(si,q)=>q<done?per[q][si]:'<span class="mut">–</span>';
+  el.innerHTML=`<table><tr><th>${L('Takım','Team')}</th>${per.map((_,q)=>`<th class="num">${q<4?'Ç'+(q+1):L('UZ','OT')+(q-3)}</th>`).join('').replace(/Ç/g,L('Ç','Q'))}<th class="num">${L('Top','Tot')}</th></tr>
+   ${[b.h,b.a].map((tid,si)=>`<tr><td>${esc(G.teams[tid].name)}</td>${per.map((_,q)=>`<td class="num">${cell(si,q)}</td>`).join('')}<td class="num"><b id="lvt${si}">${LIVE.cur?LIVE.cur[si]:0}</b></td></tr>`).join('')}</table>`}
+function liveStep(fast){
+  const L_=LIVE;if(!L_)return;const feed=document.getElementById('lvfeed');
+  if(L_.i>=L_.pb.ev.length){liveStop();const b=L_.b,me=b.h===G.user?0:b.a===G.user?1:-1,won=me<0?null:(me===0)===(b.hs>b.as);
+    const e=document.getElementById('lvend');if(e&&!e.innerHTML)e.innerHTML=`<div class="card" style="text-align:center"><div class="big ${won===null?'':won?'grt':'rdt'}">${won===null?L('MAÇ SONU','FINAL'):won?L('KAZANDIN! 🎉','YOU WIN! 🎉'):L('KAYBETTİN','YOU LOST')}</div><div class="row" style="justify-content:center;margin-top:8px"><button onclick="openBox(${L_.id})">📊 ${L('Maç istatistikleri','Box score')}</button>${L_.queue.length?`<button class="pri" onclick="openLive(${L_.queue[0]},LIVE.queue.slice(1))">▶ ${L('Bugünkü diğer maçın','Your next game today')}</button>`:''}</div></div>`;
+    const pp=document.getElementById('lvpp');if(pp)pp.style.display='none';return}
+  const e=L_.pb.ev[L_.i++];
+  let html='',cls='';
+  if(e.t==='q'){html=`<div style="padding:8px;text-align:center;background:var(--panel2);font-weight:600">${e.end?'🏁 '+L('MAÇ SONU','FINAL'):'⏱ '+qName(e.q)+' '+L('bitti','ends')}: ${e.sc[0]} – ${e.sc[1]}</div>`;L_.cur=e.sc;if(!fast)liveQuarters()}
+  else{L_.cur=e.sc;const c=clockOf(e.tm),T=G.teams[e.s?L_.b.a:L_.b.h],col=e.s?'var(--bl)':'var(--or)';
+    html=`<div style="display:flex;gap:10px;padding:6px 4px;border-bottom:1px solid #1e2530;${e.pts?'':'opacity:.8'}"><span class="mut" style="width:86px;flex:none;font-size:12px">${qName(c.q)} ${c.txt}</span><span style="width:4px;flex:none;background:${col};border-radius:2px"></span><span style="flex:1">${evText(e,L_.b)}</span><span class="mut" style="flex:none;font-size:12px">${e.sc[0]}-${e.sc[1]}</span></div>`;
+    const ck=document.getElementById('lvclk');if(ck&&!fast)ck.textContent=qName(c.q)+' · '+c.txt}
+  if(feed&&!fast)feed.insertAdjacentHTML('afterbegin',html);else if(feed)L_.buf=(html+(L_.buf||''));
+  const sc=document.getElementById('lvsc');if(sc&&L_.cur)sc.textContent=L_.cur[0]+' – '+L_.cur[1];
+  if(fast&&L_.i>=L_.pb.ev.length&&feed){feed.insertAdjacentHTML('afterbegin',L_.buf||'');L_.buf='';liveQuarters();const ck=document.getElementById('lvclk');if(ck)ck.textContent=L('Maç sonu','Final')}
+}
+
+function closeModal(){liveStop();const o=document.getElementById('ov');if(o)o.remove()}
 function startScreen(){
   if(!G)genWorld();
   const ci=UI.startC;let teams='';
@@ -612,7 +710,7 @@ function startScreen(){
     <p class="mut">${L('Gerçek oyunda yeni üyeler C liginden başlayacak. Prototipte istediğin ligden başlayabilirsin.','In the live game new members will start in a C league. In this prototype you can start anywhere.')}</p>
     <div class="scroll"><table><tr><th>${L('Takım','Team')}</th><th class="num">${L('Güç','Rating')}</th><th class="num">${L('Kadro','Roster')}</th><th class="num">${L('Bordro','Payroll')}</th><th class="num">${L('Başlangıç kasası','Starting cash')}</th><th></th></tr>
     ${lg.teams.map(id=>G.teams[id]).sort((a,b)=>rating(b)-rating(a)).map(t=>`<tr><td>${esc(t.name)}</td><td class="num">${rating(t).toFixed(1)}</td><td class="num">${t.p.length}</td><td class="num">${money(payroll(t))}</td><td class="num">${money(START_MONEY[LEAGUES[t.l].t])}</td><td><button class="sm pri" onclick="chooseTeam(${t.id})">${L('Bu takımı yönet','Manage')}</button></td></tr>`).join('')}</table></div></div>`}
-  return `<header><div class="logo">HOOP<b>WALL</b> MANAGER</div><div class="hinfo">${L('Basketbol menajerlik · prototip v4','Basketball management · prototype v4')}</div><div class="hbtn">${langBtn()}</div></header>
+  return `<header><div class="logo">HOOP<b>WALL</b> MANAGER</div><div class="hinfo">${L('Basketbol menajerlik · prototip v5','Basketball management · prototype v5')}</div><div class="hbtn">${langBtn()}</div></header>
   <main><div class="card"><h2>${L('Ülkeni seç','Choose your country')}</h2><p class="mut">${L('6 kıtadan 20 ülke · her ülkede 7 lig (A, B1–B2, C1–C4), 112 takım · tüm takımlar şimdilik bot.','20 countries on 6 continents · 7 leagues per country (A, B1–B2, C1–C4), 112 clubs · all clubs bot-managed for now.')}</p>
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">${COUNTRIES.map((c,i)=>`<div class="ccard ${ci===i?'on':''}" onclick="UI.startC=${i};render()"><div class="f">${c.flag}</div><b>${cn(i)}</b><div class="mut" style="font-size:12px">${ccont(i)}</div></div>`).join('')}</div></div>${teams}</main>`;
 }
@@ -622,6 +720,7 @@ function newGame(){G=null;DB.del();UI.startC=null;UI.cc=null;render()}
 
 document.getElementById('app').innerHTML=`<main><h2>${L('Yükleniyor…','Loading…')}</h2><p class="mut">${L('Dünya hazırlanıyor (20 ülke, 2240 takım).','Building the world (20 countries, 2,240 clubs).')}</p></main>`;
 DB.open().then(()=>DB.get()).then(g=>{if(g&&g.v===VERSION)G=g;setTimeout(render,30)});
+
 
 
 </script>
