@@ -67,6 +67,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:var(--panel2)}
 
 
 
+
 /* ================= DİL ================= */
 let LANG=(()=>{try{const s=localStorage.getItem('hw_lang');if(s)return s}catch(e){}
   let tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){}
@@ -101,10 +102,35 @@ _C('NG','Nijerya','Nigeria','🇳🇬','Afrika','Africa','Lagos,Abuja,Kano,Ibada
 _C('EG','Mısır','Egypt','🇪🇬','Afrika','Africa','Cairo,Alexandria,Giza,Port Said,Suez,Luxor,Aswan,Mansoura,Tanta,Zagazig,Ismailia,Faiyum,Hurghada,Damietta,Minya','Lions,Falcons,Eagles,Pharaohs,Titans,Stars,Comets,Sharks,Crocodiles,Foxes,Pilots,Scorpions','Mohamed,Ahmed,Omar,Youssef,Karim,Mahmoud,Mostafa,Ali,Hassan,Tarek,Amr,Khaled','Hassan,Ibrahim,Mahmoud,Mostafa,Abdelrahman,Saleh,Farouk,Nasser,Shawky,Fathy,Gamal,Said'),
 _C('AU','Avustralya','Australia','🇦🇺','Okyanusya','Oceania','Sydney,Melbourne,Brisbane,Perth,Adelaide,Hobart,Darwin,Cairns,Townsville,Geelong,Newcastle,Wollongong,Canberra,Ballarat,Bendigo,Toowoomba,Launceston,Mackay,Bunbury,Albury','Roos,Dingoes,Wolves,Titans,Falcons,Stingrays,Stars,Comets,Pilots,Koalas,Sharks,Rangers','Jack,Liam,Noah,Cooper,Lachlan,Mitchell,Josh,Riley,Brodie,Harrison,Kyle,Sam','Smith,Jones,Williams,Brown,Wilson,Taylor,Anderson,Thomas,White,Martin,Kelly,Ryan')
 ];
+/* ================= BAYRAKLAR (SVG — Windows emoji bayrak göstermediği için) ================= */
+function _star(cx,cy,R,rot=-90){const r=R*.382,p=[];for(let i=0;i<10;i++){const a=(rot+i*36)*Math.PI/180,rr=i%2?r:R;p.push((cx+rr*Math.cos(a)).toFixed(2)+','+(cy+rr*Math.sin(a)).toFixed(2))}return `<polygon points="${p.join(' ')}"`}
+const _h=(cs)=>cs.map((c,i)=>`<rect y="${(20/cs.length*i).toFixed(2)}" width="30" height="${(20/cs.length+.05).toFixed(2)}" fill="${c}"/>`).join('');
+const _v=(cs)=>cs.map((c,i)=>`<rect x="${(30/cs.length*i).toFixed(2)}" width="${(30/cs.length+.05).toFixed(2)}" height="20" fill="${c}"/>`).join('');
+const FLAG_SVG={
+ TR:`<rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.3" cy="10" r="4" fill="#E30A17"/>${_star(16.6,10,2.3,0)} fill="#fff"/>`,
+ ES:`<rect width="30" height="20" fill="#AA151B"/><rect y="5" width="30" height="10" fill="#F1BF00"/>`,
+ DE:_h(['#000','#DD0000','#FFCE00']),FR:_v(['#0055A4','#fff','#EF4135']),IT:_v(['#009246','#fff','#CE2B37']),
+ RS:_h(['#C6363C','#0C4076','#fff']),LT:_h(['#FDB913','#006A44','#C1272D']),NG:_v(['#008751','#fff','#008751']),
+ GR:_h(['#0D5EAF','#fff','#0D5EAF','#fff','#0D5EAF','#fff','#0D5EAF','#fff','#0D5EAF'])+`<rect width="11.1" height="11.1" fill="#0D5EAF"/><rect x="4.44" width="2.22" height="11.1" fill="#fff"/><rect y="4.44" width="11.1" height="2.22" fill="#fff"/>`,
+ US:_h(Array.from({length:13},(_,i)=>i%2?'#fff':'#B22234'))+`<rect width="12" height="10.77" fill="#3C3B6E"/>`+[1.5,4,6.5,9].map(y=>[1.5,4,6.5,9,10.5].map(x=>`<circle cx="${x}" cy="${y}" r=".45" fill="#fff"/>`).join('')).join(''),
+ CA:_v(['#D80621','#fff','#fff','#D80621'])+`<rect x="7.5" width="15" height="20" fill="#fff"/><polygon points="15,3.5 16.2,6.6 18.3,5.8 17.6,9 20.3,8.4 19.4,10.6 21,11.5 16.2,12.2 16.4,15.5 15,15 13.6,15.5 13.8,12.2 9,11.5 10.6,10.6 9.7,8.4 12.4,9 11.7,5.8 13.8,6.6" fill="#D80621"/>`,
+ MX:_v(['#006847','#fff','#CE1126'])+`<circle cx="15" cy="10" r="2" fill="#8C5A2B"/>`,
+ BR:`<rect width="30" height="20" fill="#009C3B"/><polygon points="15,2.2 27.5,10 15,17.8 2.5,10" fill="#FFDF00"/><circle cx="15" cy="10" r="4.3" fill="#002776"/>`,
+ AR:_h(['#74ACDF','#fff','#74ACDF'])+`<circle cx="15" cy="10" r="1.9" fill="#F6B40E"/>`,
+ CN:`<rect width="30" height="20" fill="#DE2910"/>${_star(5,5,3)} fill="#FFDE00"/>${[[10,2],[12,4],[12,7],[10,9]].map(([x,y])=>_star(x,y,1)+' fill="#FFDE00"/>').join('')}`,
+ JP:`<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#BC002D"/>`,
+ KR:`<rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="5" fill="#CD2E3A"/><path d="M10,10 A5,5 0 0,0 20,10 A2.5,2.5 0 0,0 15,10 A2.5,2.5 0 0,1 10,10Z" fill="#0047A0"/>`+[[5,4,33],[25,16,33],[25,4,-33],[5,16,-33]].map(([x,y,r])=>`<g transform="translate(${x},${y}) rotate(${r})"><rect x="-2.5" y="-1.6" width="5" height=".7" fill="#000"/><rect x="-2.5" y="-.35" width="5" height=".7" fill="#000"/><rect x="-2.5" y=".9" width="5" height=".7" fill="#000"/></g>`).join(''),
+ PH:`<rect width="30" height="10" fill="#0038A8"/><rect y="10" width="30" height="10" fill="#CE1126"/><polygon points="0,0 17.3,10 0,20" fill="#fff"/><circle cx="5.5" cy="10" r="1.9" fill="#FCD116"/>`,
+ EG:_h(['#CE1126','#fff','#000'])+`<circle cx="15" cy="10" r="1.6" fill="#C09300"/>`,
+ AU:`<rect width="30" height="20" fill="#00008B"/><path d="M0,0L15,10M15,0L0,10" stroke="#fff" stroke-width="2"/><path d="M0,0L15,10M15,0L0,10" stroke="#C8102E" stroke-width=".8"/><path d="M7.5,0V10M0,5H15" stroke="#fff" stroke-width="3"/><path d="M7.5,0V10M0,5H15" stroke="#C8102E" stroke-width="1.8"/>${_star(7.5,15,2.2)} fill="#fff"/>${[[22.5,4],[26,8.5],[22.5,16.5],[19,9.5]].map(([x,y])=>_star(x,y,1.1)+' fill="#fff"/>').join('')}`
+};
+const FLAG_HTML=COUNTRIES.map(c=>`<svg viewBox="0 0 30 20" width="1.5em" height="1em" style="vertical-align:-.12em;border-radius:2px;box-shadow:0 0 0 1px #0005;flex:none" role="img" aria-label="${c.en}">${FLAG_SVG[c.id]}</svg>`);
+const flag=ci=>FLAG_HTML[ci];
+
 const LEAGUES=[{k:'A',t:0},{k:'B1',t:1},{k:'B2',t:1},{k:'C1',t:2},{k:'C2',t:2},{k:'C3',t:2},{k:'C4',t:2}];
 const lgName=li=>L(LEAGUES[li].k+' Ligi',LEAGUES[li].k+' League');
 const cn=ci=>L(COUNTRIES[ci].tr,COUNTRIES[ci].en);
-const lgF=(ci,li)=>`${COUNTRIES[ci].flag} ${lgName(li)}`;
+const lgF=(ci,li)=>`${flag(ci)} ${lgName(li)}`;
 const ccont=ci=>L(COUNTRIES[ci].ctr,COUNTRIES[ci].cen);
 const POS=['PG','SG','SF','PF','C'];
 const POSF={PG:{s:1,r:.5,a:2.1},SG:{s:1.15,r:.6,a:1.1},SF:{s:1.1,r:1,a:.9},PF:{s:1,r:1.4,a:.6},C:{s:.9,r:1.8,a:.4}};
@@ -155,7 +181,7 @@ function money(n){const s=n<0?'-':'',a=Math.abs(n);return s+'$'+(a>=1e6?(a/1e6).
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function ovrTag(o){const c=o>=80?'#ff7a1a':o>=70?'#2ecc71':o>=60?'#4aa3ff':o>=50?'#8b97a8':'#5a6372';return `<span class="ovr" style="background:${c}33;color:${c}">${o}</span>`}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
-const flag=ci=>COUNTRIES[ci].flag;
+
 
 let G=null,UI={live:(()=>{try{return localStorage.getItem('hw_live')!=='0'}catch(e){return true}})(),lv:'country',sqv:'gen',tmv:'gen',tmId:null,tab:'panel',lc:0,ll:0,cc:null,round:null,faPos:'',faC:'',startC:null,startL:6};
 
@@ -514,7 +540,7 @@ function leaders(ids){
   const f1=v=>v.toFixed(1),fp=v=>(v*100).toFixed(1)+'%';
   return `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${box_(L('Sayı','Points'),per(0),f1)}${box_(L('Ribaunt','Rebounds'),per(1),f1)}${box_(L('Asist','Assists'),per(2),f1)}${box_(L('Top Çalma','Steals'),per(3),f1)}${box_(L('Blok','Blocks'),per(4),f1)}${box_(L('Top Kaybı','Turnovers'),per(5),f1)}${box_('FG% (min 5 '+L('atış','FGA')+')',pc(6,7,5),fp)}${box_('2P% (min 4)',p=>(p.S[7]-p.S[9])/p.g>=4?(p.S[6]-p.S[8])/(p.S[7]-p.S[9]):-1,fp)}${box_('3P% (min 2)',pc(8,9,2),fp)}${box_(L('3\'lük isabet','3PM'),per(8),f1)}${box_('FT% (min 2)',pc(10,11,2),fp)}</div>`;
 }
-const countrySel=(v,on)=>`<select onchange="${on}">${COUNTRIES.map((c,i)=>`<option value="${i}" ${i===v?'selected':''}>${c.flag} ${cn(i)}</option>`).join('')}</select>`;
+const countrySel=(v,on)=>`<select onchange="${on}">${COUNTRIES.map((c,i)=>`<option value="${i}" ${i===v?'selected':''}>${cn(i)}</option>`).join('')}</select>`;
 function lig(){
   const C=G.countries[UI.lc];
   if(UI.lv==='league'){const lg=C.leagues[UI.ll],st=standings(lg.teams,false),tier=LEAGUES[UI.ll].t;
@@ -553,7 +579,7 @@ function kupa(){
 }
 function dunya(){
   const rows=COUNTRIES.map((c,ci)=>{const A=G.countries[ci].leagues[0],s=standings(A.teams,false),avg=A.teams.reduce((x,id)=>x+rating(G.teams[id]),0)/16,titles=G.hist.filter(h=>h.ic===ci).length;
-    return `<tr class="cl ${G.teams[G.user].c===ci?'me':''}" onclick="UI.lc=${ci};UI.lv='country';UI.tab='lig';render()"><td>${c.flag} ${cn(ci)}</td><td class="mut">${ccont(ci)}</td><td class="num">${avg.toFixed(1)}</td><td>${esc(s[0].name)} <span class="mut">${s[0].w}-${s[0].lo}</span></td><td class="num">${titles||'–'}</td></tr>`}).join('');
+    return `<tr class="cl ${G.teams[G.user].c===ci?'me':''}" onclick="UI.lc=${ci};UI.lv='country';UI.tab='lig';render()"><td>${flag(ci)} ${cn(ci)}</td><td class="mut">${ccont(ci)}</td><td class="num">${avg.toFixed(1)}</td><td>${esc(s[0].name)} <span class="mut">${s[0].w}-${s[0].lo}</span></td><td class="num">${titles||'–'}</td></tr>`}).join('');
   const best=Object.values(G.P).filter(p=>p.t>=0&&!p.y).sort((a,b)=>b.o-a.o).slice(0,15);
   return `<div class="grid"><div class="card"><h3>🌐 ${L('Dünya — 20 ülke','World — 20 countries')}</h3><p class="mut">${L(`Ülkeye tıkla, bütün liglerini gör. Toplam ${G.teams.length} takım, ${Object.keys(G.P).length.toLocaleString('tr-TR')} oyuncu.`,`Click a country to browse its leagues. ${G.teams.length} teams, ${Object.keys(G.P).length.toLocaleString('en-US')} players in total.`)}</p>
    <div class="scroll"><table><tr><th>${L('Ülke','Country')}</th><th>${L('Kıta','Continent')}</th><th class="num">${L('A Ligi gücü','A League rtg')}</th><th>${L('A Ligi lideri','A League leader')}</th><th class="num">🌍</th></tr>${rows}</table></div></div>
@@ -659,7 +685,7 @@ function transfer(){
   if(v==='fa'){let Ls=G.fa.map(id=>G.P[id]);if(UI.faPos)Ls=Ls.filter(p=>p.pos===UI.faPos);if(UI.faC!=='')Ls=Ls.filter(p=>p.nat===+UI.faC);Ls.sort((a,b)=>b.o-a.o);Ls=Ls.slice(0,60);
     return tabs+info+`<div class="card"><div class="row" style="justify-content:space-between"><h3>${L('Serbest Oyuncular','Free Agents')}</h3><div class="row">
     <select onchange="UI.faPos=this.value;render()"><option value="">${L('Tüm pozisyonlar','All positions')}</option>${POS.map(p=>`<option ${UI.faPos===p?'selected':''}>${p}</option>`).join('')}</select>
-    <select onchange="UI.faC=this.value;render()"><option value="">${L('Tüm uyruklar','All nationalities')}</option>${COUNTRIES.map((c,i)=>`<option value="${i}" ${UI.faC===String(i)?'selected':''}>${c.flag} ${cn(i)}</option>`).join('')}</select>${viewBtns(UI.fav||'gen','UI.fav')}</div></div>
+    <select onchange="UI.faC=this.value;render()"><option value="">${L('Tüm uyruklar','All nationalities')}</option>${COUNTRIES.map((c,i)=>`<option value="${i}" ${UI.faC===String(i)?'selected':''}>${cn(i)}</option>`).join('')}</select>${viewBtns(UI.fav||'gen','UI.fav')}</div></div>
     <p class="mut">${L('Serbest oyuncular bonservissiz ama doğrudan imzalanamaz: "Açık artırma başlat" ile 2 günlük bir artırma açarsın, diğer takımlar da teklif verebilir. Kazanırsan 3 yıllık sözleşme imzalanır (maaş sütundaki gibi).','Free agents can\'t be signed directly: "Start auction" opens a 2-day auction that other clubs can join. Win it and he signs for 3 seasons (wage as shown).')}</p>
     ${playerTable(Ls,UI.fav||'gen',{wage:p=>money(salary(p.o)),act:p=>{const a=aucOf(p.id);return a?`<button class="sm" onclick="UI.trv='auc';render()">🔨 ${L('Artırmada','In auction')} · ${money(a.price)}</button>`:`<button class="sm gr" onclick="startFA(${p.id})">🔨 ${L('Açık artırma başlat','Start auction')} · ${money(signBonus(p))}</button>`}})}</div>`}
   if(v==='mine'){const bids=G.auc.filter(a=>a.um>0&&a.seller!==G.user),sales=G.auc.filter(a=>a.seller===G.user);
@@ -906,13 +932,13 @@ function startScreen(){
   const ci=UI.startC;let teams='';
   if(ci!==null){const lg=G.countries[ci].leagues[UI.startL];
     teams=`<div class="card" style="margin-top:14px"><div class="row" style="justify-content:space-between"><h3>${flag(ci)} ${cn(ci)} — ${L('takımını seç','pick your club')}</h3>
-    <select onchange="UI.startL=+this.value;render()">${LEAGUES.map((_,i)=>`<option value="${i}" ${i===UI.startL?'selected':''}>${lgF(ci,i)}${LEAGUES[i].t===2?L(' (önerilen başlangıç)',' (recommended start)'):''}</option>`).join('')}</select></div>
+    <select onchange="UI.startL=+this.value;render()">${LEAGUES.map((_,i)=>`<option value="${i}" ${i===UI.startL?'selected':''}>${lgName(i)}${LEAGUES[i].t===2?L(' (önerilen başlangıç)',' (recommended start)'):''}</option>`).join('')}</select></div>
     <p class="mut">${L('Gerçek oyunda yeni üyeler C liginden başlayacak. Prototipte istediğin ligden başlayabilirsin.','In the live game new members will start in a C league. In this prototype you can start anywhere.')}</p>
     <div class="scroll"><table><tr><th>${L('Takım','Team')}</th><th class="num">${L('Güç','Rating')}</th><th class="num">${L('Kadro','Roster')}</th><th class="num">${L('Bordro','Payroll')}</th><th class="num">${L('Başlangıç kasası','Starting cash')}</th><th></th></tr>
     ${lg.teams.map(id=>G.teams[id]).sort((a,b)=>rating(b)-rating(a)).map(t=>`<tr><td>${esc(t.name)}</td><td class="num">${rating(t).toFixed(1)}</td><td class="num">${t.p.length}</td><td class="num">${money(payroll(t))}</td><td class="num">${money(START_MONEY[LEAGUES[t.l].t])}</td><td><button class="sm pri" onclick="chooseTeam(${t.id})">${L('Bu takımı yönet','Manage')}</button></td></tr>`).join('')}</table></div></div>`}
   return `<header><div class="logo">HOOP<b>WALL</b> MANAGER</div><div class="hinfo">${L('Basketbol menajerlik · prototip v7','Basketball management · prototype v7')}</div><div class="hbtn">${langBtn()}</div></header>
   <main><div class="card"><h2>${L('Ülkeni seç','Choose your country')}</h2><p class="mut">${L('6 kıtadan 20 ülke · her ülkede 7 lig (A, B1–B2, C1–C4), 112 takım · tüm takımlar şimdilik bot.','20 countries on 6 continents · 7 leagues per country (A, B1–B2, C1–C4), 112 clubs · all clubs bot-managed for now.')}</p>
-  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">${COUNTRIES.map((c,i)=>`<div class="ccard ${ci===i?'on':''}" onclick="UI.startC=${i};render()"><div class="f">${c.flag}</div><b>${cn(i)}</b><div class="mut" style="font-size:12px">${ccont(i)}</div></div>`).join('')}</div></div>${teams}</main>`;
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">${COUNTRIES.map((c,i)=>`<div class="ccard ${ci===i?'on':''}" onclick="UI.startC=${i};render()"><div class="f">${flag(i)}</div><b>${cn(i)}</b><div class="mut" style="font-size:12px">${ccont(i)}</div></div>`).join('')}</div></div>${teams}</main>`;
 }
 function chooseTeam(id){G.user=id;const t=G.teams[id];t.tac=JSON.parse(JSON.stringify(DEF_TAC));G.money=START_MONEY[LEAGUES[t.l].t];UI.lc=t.c;UI.ll=t.l;UI.cc=t.c;
   addNews(`🤝 <b>${esc(t.name)}</b> takımının menajeri oldun!`,`🤝 You are the new manager of <b>${esc(t.name)}</b>!`);save();render()}
@@ -920,6 +946,7 @@ function newGame(){G=null;DB.del();UI.startC=null;UI.cc=null;render()}
 
 document.getElementById('app').innerHTML=`<main><h2>${L('Yükleniyor…','Loading…')}</h2><p class="mut">${L('Dünya hazırlanıyor (20 ülke, 2240 takım).','Building the world (20 countries, 2,240 clubs).')}</p></main>`;
 DB.open().then(()=>DB.get()).then(g=>{if(g&&g.v===VERSION){G=g;if(!G.auc){G.auc=[];G.aucN=0;G.tick=0;G.seq=1}}setTimeout(render,30)});
+
 
 
 
