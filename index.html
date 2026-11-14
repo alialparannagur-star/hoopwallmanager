@@ -62,6 +62,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:var(--panel2)}
 <div id="app"></div>
 <div id="toast"></div>
 <script>
+
 /* ================= DİL ================= */
 let LANG=(()=>{try{const s=localStorage.getItem('hw_lang');if(s)return s}catch(e){}
   let tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){}
@@ -75,7 +76,7 @@ const N_ES='Toros,Leones,Lobos,Halcones,Titanes,Estrellas,Cometas,Tiburones,Águ
 const N_EN='Hawks,Lions,Wolves,Titans,Falcons,Bears,Stars,Comets,Pilots,Foxes,Sharks,Rangers';
 const N_AS='Tigers,Dragons,Phoenix,Cranes,Falcons,Stars,Comets,Sharks,Eagles,Bears,Foxes,Pilots';
 const COUNTRIES=[
-_C('TR','Türkiye','Türkiye','🇹🇷','Avrupa / Asya','Europe / Asia','İstanbul,Ankara,İzmir,Adana,Bursa,Antalya,Konya,Gaziantep,Mersin,Kayseri,Eskişehir,Samsun,Trabzon,Denizli,Sakarya,Malatya,Erzurum,Diyarbakır,Manisa,Balıkesir,Hatay,Kocaeli,Tekirdağ,Muğla,Aydın,Sivas,Van,Bolu','Basket,Spor,Kartalları,Aslanları,Yıldızları,Kurtları,Gençlik,Akademi,Kanatları,Dinamo,Atletik,Potası','Emre,Burak,Can,Mert,Kerem,Ozan,Arda,Berk,Efe,Cem,Onur,Kaan,Deniz,Yiğit,Barış','Yılmaz,Kaya,Demir,Şahin,Çelik,Arslan,Doğan,Koç,Aydın,Öztürk,Kurt,Polat,Aksoy,Erdem,Tekin'),
+_C('TR','Türkiye','Türkiye','🇹🇷','Avrupa','Europe','İstanbul,Ankara,İzmir,Adana,Bursa,Antalya,Konya,Gaziantep,Mersin,Kayseri,Eskişehir,Samsun,Trabzon,Denizli,Sakarya,Malatya,Erzurum,Diyarbakır,Manisa,Balıkesir,Hatay,Kocaeli,Tekirdağ,Muğla,Aydın,Sivas,Van,Bolu','Basket,Spor,Kartalları,Aslanları,Yıldızları,Kurtları,Gençlik,Akademi,Kanatları,Dinamo,Atletik,Potası','Emre,Burak,Can,Mert,Kerem,Ozan,Arda,Berk,Efe,Cem,Onur,Kaan,Deniz,Yiğit,Barış','Yılmaz,Kaya,Demir,Şahin,Çelik,Arslan,Doğan,Koç,Aydın,Öztürk,Kurt,Polat,Aksoy,Erdem,Tekin'),
 _C('ES','İspanya','Spain','🇪🇸','Avrupa','Europe','Madrid,Barcelona,Valencia,Sevilla,Málaga,Bilbao,Zaragoza,Murcia,Palma,Alicante,Granada,Vigo,Gijón,Valladolid,Córdoba,Oviedo,Santander,Burgos,León,Cádiz',N_ES,'Pablo,Javier,Sergio,Álvaro,Diego,Marc,Hugo,Raúl,Iván,Adrián,Jorge,Víctor','García,Martínez,López,Sánchez,Pérez,Gómez,Ruiz,Díaz,Moreno,Navarro,Torres,Romero'),
 _C('DE','Almanya','Germany','🇩🇪','Avrupa','Europe','Berlin,Hamburg,München,Köln,Frankfurt,Stuttgart,Düsseldorf,Leipzig,Dortmund,Essen,Bremen,Dresden,Hannover,Nürnberg,Bonn,Mannheim,Kiel,Ulm,Bamberg,Würzburg','Adler,Löwen,Wölfe,Falken,Titanen,Sterne,Kometen,Haie,Bären,Füchse,Piloten,Ritter','Lukas,Jonas,Felix,Leon,Paul,Tim,Niklas,Moritz,Jan,Max,Tobias,Fabian','Müller,Schmidt,Schneider,Fischer,Weber,Wagner,Becker,Hoffmann,Koch,Richter,Wolf,Krüger'),
 _C('FR','Fransa','France','🇫🇷','Avrupa','Europe','Paris,Lyon,Marseille,Lille,Nantes,Bordeaux,Toulouse,Nice,Strasbourg,Rennes,Dijon,Limoges,Pau,Le Mans,Nancy','Lions,Loups,Aigles,Faucons,Titans,Étoiles,Comètes,Requins,Ours,Renards,Pilotes,Taureaux','Lucas,Hugo,Théo,Nathan,Louis,Enzo,Mathis,Jules,Antoine,Maxime,Bastien,Rémi','Martin,Bernard,Dubois,Thomas,Robert,Richard,Petit,Durand,Leroy,Moreau,Simon,Laurent'),
@@ -103,6 +104,22 @@ const ccont=ci=>L(COUNTRIES[ci].ctr,COUNTRIES[ci].cen);
 const POS=['PG','SG','SF','PF','C'];
 const POSF={PG:{s:1,r:.5,a:2.1},SG:{s:1.15,r:.6,a:1.1},SF:{s:1.1,r:1,a:.9},PF:{s:1,r:1.4,a:.6},C:{s:.9,r:1.8,a:.4}};
 const TIER_BASE=[70,61,53];
+/* OYUNCU ÖZELLİKLERİ: [kod, TR kısa, EN kısa, TR ad, EN ad] */
+const ATTR=[['3PT','ÜÇL','3PT','Üçlük Atış','3-Point Shooting'],['MID','ORT','MID','Orta Mesafe (2\'lik)','Mid-Range (2PT)'],['FIN','BİT','FIN','Pota Altı Bitiricilik','Finishing'],['FT','SA','FT','Serbest Atış','Free Throw'],
+ ['PAS','PAS','PAS','Pas','Passing'],['DRB','SÜR','DRB','Top Sürme','Dribbling'],['HND','KNT','HND','Top Kontrolü','Ball Handling'],
+ ['SPD','HIZ','SPD','Hız','Speed'],['STR','FİZ','STR','Fizik / Güç','Strength'],['JMP','SIÇ','JMP','Sıçrama','Vertical'],
+ ['REB','RİB','REB','Ribaunt','Rebounding'],['PDF','DSV','PDF','Dış Savunma','Perimeter Defense'],['IDF','PTK','IDF','Pota Koruma / Blok','Interior Defense'],['STL','ÇAL','STL','Top Çalma','Stealing']];
+const AI=Object.fromEntries(ATTR.map((a,i)=>[a[0],i]));
+const ATTR_GROUPS=[[L=>L('Şut','Shooting'),[0,1,2,3]],[L=>L('Oyun Kurma','Playmaking'),[4,5,6]],[L=>L('Atletizm','Athleticism'),[7,8,9]],[L=>L('Savunma','Defense'),[10,11,12,13]]];
+const POS_OFF={PG:[3,1,0,3,8,8,8,7,-8,0,-10,3,-12,5],SG:[7,5,2,5,1,3,2,4,-5,1,-7,3,-10,3],SF:[2,3,3,1,-1,0,0,2,0,3,-1,3,-2,1],PF:[-4,1,4,-2,-4,-6,-5,-3,6,3,7,-2,5,-2],C:[-12,-4,7,-6,-5,-12,-8,-7,10,4,11,-5,11,-3]};
+const POS_W=Object.fromEntries(Object.entries(POS_OFF).map(([k,v])=>[k,v.map(x=>1+Math.max(0,x)/4)]));
+function calcOvr(p){const w=POS_W[p.pos];let s=0,ws=0;p.at.forEach((v,i)=>{s+=v*w[i];ws+=w[i]});return Math.round(s/ws)}
+function shiftAttrs(p,d,age){p.at=p.at.map((v,i)=>clamp(v+d+(d?rnd(-1,1):0)+(age>=30&&(i===7||i===9)?-1:0),20,99));p.o=calcOvr(p)}
+function makeAttrs(p,target){p.at=POS_OFF[p.pos].map(o=>clamp(Math.round(target+o+gauss()*5),20,99));p.o=calcOvr(p);
+  for(let k=0;k<3&&p.o!==target;k++){const d=target-p.o;p.at=p.at.map(v=>clamp(v+d,20,99));p.o=calcOvr(p)}}
+/* İSTATİSTİK: S dizisi = [SAY,RİB,AST,TÇ,BLK,TK,FGM,FGA,3PM,3PA,FTM,FTA,DK] */
+const newS=()=>[0,0,0,0,0,0,0,0,0,0,0,0,0];
+const pct=(m,a)=>a?(100*m/a).toFixed(1)+'%':'-';
 /* EKONOMİ (dolar) */
 const INCOME=[60000,22000,9000];            // günlük gelir (lig seviyesine göre)
 const START_MONEY=[2000000,800000,350000];
@@ -110,7 +127,7 @@ const POS_PRIZE=[40000,15000,6000];          // (17-sıra) x bu
 const INTL_PRIZE=1500000;
 const CUP_PRIZE=[10000,20000,40000,80000,160000,320000,750000]; // tur kazanınca
 const CUP_DAYS=[2,6,10,14,18,22,26];
-const DAYS=30,MAX_ROSTER=15,MAX_YOUTH=8,VERSION=3,MAX_BUILDS=2;
+const DAYS=30,MAX_ROSTER=15,MAX_YOUTH=8,VERSION=4,MAX_BUILDS=2;
 const FAC=[
  {i:'🏟️',tr:'Arena',en:'Arena',dtr:'Günlük gelir her seviyede +%15, ev sahibi avantajı artar.',den:'Daily income +15% per level, stronger home advantage.'},
  {i:'🏋️',tr:'Antrenman Tesisi',en:'Training Center',dtr:'Sezon sonunda oyuncular daha çok gelişir.',den:'Players improve more at season end.'},
@@ -135,7 +152,7 @@ function ovrTag(o){const c=o>=80?'#ff7a1a':o>=70?'#2ecc71':o>=60?'#4aa3ff':o>=50
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600)}
 const flag=ci=>COUNTRIES[ci].flag;
 
-let G=null,UI={tab:'panel',lc:0,ll:0,cc:null,round:null,faPos:'',faC:'',startC:null,startL:6};
+let G=null,UI={lv:'country',sqv:'gen',tmv:'gen',tmId:null,tab:'panel',lc:0,ll:0,cc:null,round:null,faPos:'',faC:'',startC:null,startL:6};
 
 /* Kayıt: IndexedDB */
 const DB={db:null,
@@ -150,11 +167,12 @@ const newsText=n=>`<b>S${n.s} ${L('G','D')}${n.d}</b> — ${L(n.tr,n.en)}`;
 /* ================= OYUNCU / EKONOMİ ================= */
 function salary(o){return Math.max(1500,Math.round(1000*Math.pow(1.13,o-40)/500)*500)}   // sezonluk
 function value(p){const f=p.a<=21?1.8:p.a<=24?1.4:p.a<=29?1:p.a<=32?.6:.3;const pot=p.a<=24?(p.pt-p.o)*.15:0;return Math.max(5000,Math.round(Math.pow(Math.max(0,p.o-38+pot),2)*300*f/1000)*1000)}
-function newPlayer(ci,tier,youth,yb=0){
+function newPlayer(ci,tier,youth,yb=0,pos){
   const nat=Math.random()<.82?ci:rnd(0,COUNTRIES.length-1),N=COUNTRIES[nat];
-  const p={id:G.nid++,n:pick(N.first)+' '+pick(N.last),nat,pos:pick(POS),t:-1,y:!!youth,g:0,pts:0,reb:0,ast:0,s:0,c:0};
-  if(youth){p.a=rnd(16,19);p.o=rnd(34,50)+(2-tier)*2+yb;p.pt=clamp(p.o+rnd(15,42)+Math.round(yb*1.5),50,97)}
-  else{p.a=rnd(19,34);p.o=clamp(Math.round(TIER_BASE[tier]+gauss()*6),30,92);p.pt=p.a<24?clamp(p.o+rnd(3,18),p.o,96):p.o;p.s=salary(p.o);p.c=rnd(1,4)}
+  const p={id:G.nid++,n:pick(N.first)+' '+pick(N.last),nat,pos:pos||pick(POS),t:-1,y:!!youth,g:0,S:newS(),s:0,c:0};
+  let o;if(youth){p.a=rnd(16,19);o=rnd(34,50)+(2-tier)*2+yb}else{p.a=rnd(19,34);o=clamp(Math.round(TIER_BASE[tier]+gauss()*6),30,92)}
+  makeAttrs(p,o);
+  if(youth)p.pt=clamp(p.o+rnd(15,42)+Math.round(yb*1.5),50,97);else{p.pt=p.a<24?clamp(p.o+rnd(3,18),p.o,96):p.o;p.s=salary(p.o);p.c=rnd(1,4)}
   G.P[p.id]=p;return p;
 }
 function income(t){return Math.round(INCOME[LEAGUES[t.l].t]*(1+.15*(t.f[0]-1)))}
@@ -171,7 +189,7 @@ function teamNames(c,n){const all=[];c.cities.forEach(ci=>c.nick.forEach(nk=>all
 function newTeam(name,ci,li){
   const t={id:G.teams.length,name,c:ci,l:li,p:[],y:[],w:0,lo:0,pf:0,pa:0,iw:0,il:0,ipf:0,ipa:0,tempo:1,focus:0,form:[],f:[1,1,1,1,1]};
   G.teams.push(t);const tier=LEAGUES[li].t,size=rnd(13,15);
-  for(let i=0;i<size;i++){const p=newPlayer(ci,tier,false);p.pos=POS[i%5];p.t=t.id;t.p.push(p.id)}
+  for(let i=0;i<size;i++){const p=newPlayer(ci,tier,false,0,POS[i%5]);p.t=t.id;t.p.push(p.id)}
   for(let i=0,n=rnd(3,5);i<n;i++){const p=newPlayer(ci,tier,true);p.t=t.id;t.y.push(p.id)}
   return t;
 }
@@ -179,7 +197,7 @@ function makeFixtures(n){const arr=[...Array(n).keys()],R=[];
   for(let r=0;r<n-1;r++){const rd=[];for(let i=0;i<n/2;i++){let h=arr[i],a=arr[n-1-i];if(r%2&&i===0)[h,a]=[a,h];rd.push([h,a])}R.push(rd);arr.splice(1,0,arr.pop())}
   return R.concat(R.map(rd=>rd.map(([h,a])=>[a,h])))}
 function genWorld(){
-  G={v:VERSION,season:1,day:0,teams:[],P:{},nid:0,fa:[],news:[],user:null,money:0,countries:[],intl:null,boxes:[],hist:[],builds:[],neg:false};
+  G={v:VERSION,bx:{},bxN:0,season:1,day:0,teams:[],P:{},nid:0,fa:[],news:[],user:null,money:0,countries:[],intl:null,boxes:[],hist:[],builds:[],neg:false};
   COUNTRIES.forEach((c,ci)=>{const names=teamNames(c,112);let k=0;
     const leagues=LEAGUES.map((_,li)=>{const ids=[];for(let i=0;i<16;i++)ids.push(newTeam(names[k++],ci,li).id);return {teams:ids,fx:makeFixtures(16),res:[]}});
     G.countries.push({leagues,cup:null});
@@ -200,7 +218,7 @@ function setupCup(ci){const C=G.countries[ci],rest=[];for(let li=1;li<7;li++)res
   C.cup={r:0,ties:pairUp(rest),byes:C.leagues[0].teams.slice(),done:[],champ:null}}
 function playCupRound(ci,r){
   const C=G.countries[ci],K=C.cup;if(K.champ!==null||K.r!==r)return;
-  const win=[];K.ties.forEach(t=>{const res=playMatch(t[0],t[1],2);t[2]=res[0];t[3]=res[1];const w=res[0]>res[1]?t[0]:t[1],l=w===t[0]?t[1]:t[0];win.push(w);
+  const win=[];K.ties.forEach(t=>{const res=playMatch(t[0],t[1],2);t[2]=res[0];t[3]=res[1];t[4]=res[5];const w=res[0]>res[1]?t[0]:t[1],l=w===t[0]?t[1]:t[0];win.push(w);
     if(w===G.user){const pr=CUP_PRIZE[r];G.money+=pr;addNews(r===6?`🏆 <b>KUPA ŞAMPİYONU OLDUN!</b> +${money(pr)}`:`🏆 Kupada ${CUP_TR[r]} geçildi! +${money(pr)}`,r===6?`🏆 <b>YOU WON THE CUP!</b> +${money(pr)}`:`🏆 Cup: through the ${CUP_EN[r]}! +${money(pr)}`)}
     if(l===G.user)addNews(`❌ Kupaya ${CUP_TR[r]} turunda veda ettin.`,`❌ Knocked out of the cup in the ${CUP_EN[r]}.`)});
   K.done.push(K.ties);
@@ -214,14 +232,25 @@ function playCupRound(ci,r){
 const roster=t=>t.p.map(id=>G.P[id]).sort((a,b)=>b.o-a.o);
 function rating(t){const ps=roster(t),w=[1,1,1,1,1,.75,.6,.45,.3,.2];let s=0,ws=0;for(let i=0;i<10;i++){s+=(ps[i]?ps[i].o:30)*w[i];ws+=w[i]}return s/ws}
 function box(t,pts){
-  const ps=roster(t).slice(0,10),mins=[34,32,30,28,26,22,18,14,10,6];
+  const ps=roster(t).slice(0,10),mins=[34,32,30,28,26,22,18,14,10,6],A=(p,k)=>p.at[AI[k]],J=()=>.7+Math.random()*.6;
   const ws=ps.map((p,i)=>mins[i]*Math.pow(p.o/70,2)*POSF[p.pos].s*(.65+Math.random()*.7));
-  const wr=ps.map((p,i)=>mins[i]*POSF[p.pos].r*(.7+Math.random()*.6)),wa=ps.map((p,i)=>mins[i]*POSF[p.pos].a*(.7+Math.random()*.6));
-  const S=a=>a.reduce((x,y)=>x+y,0),sw=S(ws),sr=S(wr),sa=S(wa),R=rnd(34,46),A=rnd(16,28);let left=pts;const lines=[];
+  const W={r:ps.map((p,i)=>mins[i]*Math.pow((A(p,'REB')*.7+A(p,'STR')*.3)/60,2)*J()),a:ps.map((p,i)=>mins[i]*Math.pow(A(p,'PAS')/60,2.5)*J()),
+    st:ps.map((p,i)=>mins[i]*Math.pow(A(p,'STL')/60,3)*Math.random()),bl:ps.map((p,i)=>mins[i]*Math.pow((A(p,'IDF')+A(p,'JMP'))/120,4)*Math.random()),
+    to:ps.map((p,i)=>(ws[i]+mins[i]*.4)*(75/A(p,'HND'))*Math.random())};
+  const T={r:rnd(34,46),a:rnd(16,28),st:rnd(4,11),bl:rnd(2,7),to:rnd(9,17)},sum=a=>a.reduce((x,y)=>x+y,0)||1,SW={};Object.keys(W).forEach(k=>SW[k]=sum(W[k]));const sw=sum(ws);
+  let left=pts;const lines=[];
   ps.forEach((p,i)=>{let v=i===ps.length-1?left:Math.round(pts*ws[i]/sw);v=Math.max(0,Math.min(v,left));left-=v;
-    const r=Math.round(R*wr[i]/sr),a=Math.round(A*wa[i]/sa);p.g++;p.pts+=v;p.reb+=r;p.ast+=a;lines.push([p.id,mins[i],v,r,a])});
+    const q=k=>Math.round(T[k]*W[k][i]/SW[k]);
+    const t3=A(p,'3PT'),fi=(A(p,'FIN')+A(p,'MID'))/2,ftA=A(p,'FT');
+    let ftm=Math.min(v,Math.round(v*clamp(.06+(A(p,'FIN')+A(p,'STR')-100)/700,.03,.25)*(.6+Math.random()*.8)));
+    const r=v-ftm,sh3=clamp((t3-35)/70+(Math.random()-.5)*.2,0,.7);let tpm=Math.round(r*sh3/3),rem=r-3*tpm,m2=Math.floor(rem/2);ftm+=rem-2*m2;
+    const p3=clamp(.25+(t3-40)*.004+gauss()*.04,.12,.55),p2=clamp(.40+(fi-40)*.0045+gauss()*.05,.28,.75),pf=clamp(.62+(ftA-40)*.0055+gauss()*.04,.4,.95);
+    const tpa=tpm?Math.max(tpm,Math.round(tpm/p3)):(sh3>.2?rnd(0,2):0),a2=m2?Math.max(m2,Math.round(m2/p2)):rnd(0,2),fta=ftm?Math.max(ftm,Math.round(ftm/pf)):(Math.random()<.3?rnd(1,2):0);
+    const line=[p.id,mins[i],v,q('r'),q('a'),q('st'),q('bl'),q('to'),tpm+m2,tpa+a2,tpm,tpa,ftm,fta];
+    p.g++;for(let k=0;k<12;k++)p.S[k]+=line[k+2];p.S[12]+=mins[i];lines.push(line)});
   return lines;
 }
+let CUR={c:-1,l:-1};
 function playMatch(hid,aid,mode){ // mode 0 lig, 1 uluslararası, 2 kupa
   const H=G.teams[hid],A=G.teams[aid],rh=rating(H),ra=rating(A);
   const poss=74+(H.tempo+A.tempo-2)*2.5+rnd(-3,3);
@@ -232,14 +261,15 @@ function playMatch(hid,aid,mode){ // mode 0 lig, 1 uluslararası, 2 kupa
   if(mode===1){H.ipf+=hs;H.ipa+=as;A.ipf+=as;A.ipa+=hs;if(hs>as){H.iw++;A.il++}else{A.iw++;H.il++}}
   else if(mode===0){H.pf+=hs;H.pa+=as;A.pf+=as;A.pa+=hs;if(hs>as){H.w++;A.lo++}else{A.w++;H.lo++}
     H.form.push(hs>as?'W':'L');A.form.push(as>hs?'W':'L');if(H.form.length>5)H.form.shift();if(A.form.length>5)A.form.shift()}
-  if(hid===G.user||aid===G.user){G.boxes.push({h:hid,a:aid,hs,as,ot,mode,day:G.day+1,bh,ba});
-    if((hid===G.user)===(hs>as))G.money+=Math.round(income(G.teams[G.user])*.5)}
+  const mine=hid===G.user||aid===G.user;let bid=null;
+  if(mine||(mode===0&&H.c===CUR.c&&H.l===CUR.l)){bid=G.bxN++;G.bx[bid]={h:hid,a:aid,hs,as,ot,mode,day:G.day+1,bh,ba}}
+  if(mine){G.boxes.push(bid);if((hid===G.user)===(hs>as))G.money+=Math.round(income(G.teams[G.user])*.5)}
   const top=[...bh,...ba].sort((x,y)=>y[2]-x[2])[0];
-  return [hs,as,top[0],top[2],ot];
+  return [hs,as,top[0],top[2],ot,bid];
 }
 function playDay(){
   if(G.day>=DAYS){endSeason();return}
-  const d=G.day;G.boxes=[];
+  const d=G.day;G.boxes=[];{const U=G.teams[G.user];CUR={c:U.c,l:U.l}}
   G.countries.forEach(c=>c.leagues.forEach(lg=>{lg.res[d]=lg.fx[d].map(([h,a])=>playMatch(lg.teams[h],lg.teams[a],0))}));
   const ir=G.intl.days.indexOf(d);
   if(ir>=0)G.intl.res[ir]=G.intl.fx[ir].map(([h,a])=>(h>=G.intl.n||a>=G.intl.n)?null:playMatch(G.intl.teams[h],G.intl.teams[a],1));
@@ -282,6 +312,9 @@ function endSeason(){
   G.teams.forEach(t=>{t.p=t.p.filter(id=>{const p=G.P[id];p.c--;if(p.c>0)return true;
     if(t.id===G.user){p.t=-1;G.fa.push(id);addNews(`📝 <b>${esc(p.n)}</b> sözleşmesi bittiği için takımdan ayrıldı.`,`📝 <b>${esc(p.n)}</b> left: contract expired.`);return false}
     if(Math.random()<.75){p.c=rnd(1,3);p.s=salary(p.o);return true}p.t=-1;G.fa.push(id);return false})});
+  // kural: kullanıcı takımında en az 10 oyuncu
+  {const U=G.teams[G.user],tier=LEAGUES[U.l].t;while(U.p.length<10){const fit=G.fa.map(id=>G.P[id]).filter(p=>p.o<=TIER_BASE[tier]-4).sort((a,b)=>b.o-a.o)[0]||newPlayer(U.c,2,false);
+    G.fa=G.fa.filter(x=>x!==fit.id);fit.t=U.id;fit.s=salary(fit.o);fit.c=1;U.p.push(fit.id);addNews(`🧾 Kadro 10 kişinin altına düştüğü için federasyon ${esc(fit.n)} (OVR ${fit.o}) ile 1 yıllık zorunlu imza attırdı.`,`🧾 Your roster fell below 10, so the league assigned ${esc(fit.n)} (OVR ${fit.o}) on a 1-year deal.`)}}
   // altyapı
   G.teams.forEach(t=>{
     t.y=t.y.filter(id=>{const p=G.P[id];if(p.a<20)return true;p.y=false;p.s=salary(p.o);p.c=3;
@@ -294,7 +327,7 @@ function endSeason(){
   G.fa=G.fa.filter(id=>{const p=G.P[id];if(p.a>=34){delete G.P[id];return false}return true});
   COUNTRIES.forEach((c,ci)=>{for(let i=0;i<12;i++)G.fa.push(newPlayer(ci,rnd(1,2),false).id)});
   if(G.fa.length>800){G.fa.sort((a,b)=>G.P[b].o-G.P[a].o);G.fa.slice(800).forEach(id=>delete G.P[id]);G.fa.length=800}
-  G.teams.forEach(t=>{t.w=t.lo=t.pf=t.pa=0;t.form=[]});Object.values(G.P).forEach(p=>{p.g=p.pts=p.reb=p.ast=0});
+  G.teams.forEach(t=>{t.w=t.lo=t.pf=t.pa=0;t.form=[]});Object.values(G.P).forEach(p=>{p.g=0;p.S=newS()});G.bx={};
   setupIntl(qual);G.countries.forEach((_,ci)=>setupCup(ci));
   if(G.intl.teams.includes(G.user))addNews('🌍 Şampiyon olarak yeni sezonda <b>Uluslararası Lig</b>\'e katılıyorsun!','🌍 As champions, you enter the <b>International League</b> next season!');
   G.season++;G.day=0;G.boxes=[];addNews(`🆕 ${G.season}. sezon başladı.`,`🆕 Season ${G.season} has started.`);
@@ -302,7 +335,7 @@ function endSeason(){
 function develop(p,f){p.a++;let d;
   if(p.a<=20)d=rnd(2,8);else if(p.a<=23)d=rnd(1,6);else if(p.a<=27)d=rnd(-1,3);else if(p.a<=30)d=rnd(-3,1);else if(p.a<=33)d=rnd(-5,0);else d=rnd(-8,-2);
   if(d>0)d+=rnd(0,Math.floor(f[1]/3));else if(d<0&&p.a>=30)d=Math.round(d*(1-.06*(f[3]-1)));
-  p.o=d>0?Math.min(Math.max(p.pt,p.o),p.o+d):Math.max(25,p.o+d);if(p.a>27)p.pt=p.o}
+  const no=d>0?Math.min(Math.max(p.pt,p.o),p.o+d):Math.max(25,p.o+d);shiftAttrs(p,no-p.o,p.a);if(p.a>27||p.o>p.pt)p.pt=Math.max(p.pt,p.o);if(p.a>27)p.pt=p.o}
 function release(t,pid){t.p=t.p.filter(x=>x!==pid);G.P[pid].t=-1;G.fa.push(pid)}
 function botManage(t){
   const tier=LEAGUES[t.l].t;
@@ -360,9 +393,9 @@ function todayMatches(){
 function panel(){
   const U=G.teams[G.user],lg=G.countries[U.c].leagues[U.l],pos=standings(lg.teams,false).findIndex(t=>t.id===U.id)+1,tm=todayMatches();
   const exp=U.p.filter(id=>G.P[id].c===1).length,pay=payroll(U),inc=income(U);
-  const boxHtml=G.boxes.length?G.boxes.map(b=>`<div style="margin-bottom:12px"><div class="mut">${[L('Lig','League'),'🌍 '+L('Uluslararası','International'),'🏆 '+L('Kupa','Cup')][b.mode]} · ${L('Gün','Day')} ${b.day}</div><div class="big">${b.hs} – ${b.as}${b.ot?' <span class="pill">'+L('UZ','OT')+'</span>':''}</div><div>${esc(G.teams[b.h].name)} vs ${esc(G.teams[b.a].name)}</div>
-   <div class="scroll"><table><tr><th>${L('Oyuncu','Player')}</th><th class="num">${L('DK','MIN')}</th><th class="num">${L('SAY','PTS')}</th><th class="num">${L('RİB','REB')}</th><th class="num">${L('AST','AST')}</th></tr>
-   ${(b.h===G.user?b.bh:b.ba).map(l=>{const p=G.P[l[0]];return p?`<tr><td>${esc(p.n)} <span class="mut">${p.pos}</span></td><td class="num">${l[1]}</td><td class="num"><b>${l[2]}</b></td><td class="num">${l[3]}</td><td class="num">${l[4]}</td></tr>`:''}).join('')}</table></div></div>`).join(''):`<p class="mut">${L('Henüz maç oynanmadı. Üstteki ▶ Günü Oynat ile başla.','No games played yet. Press ▶ Play Day above.')}</p>`;
+  const boxHtml=G.boxes.length?G.boxes.map(id=>{const b=G.bx[id];if(!b)return '';const mine=b.h===G.user?b.bh:b.ba,won=(b.h===G.user)===(b.hs>b.as),top=mine.slice().sort((x,y)=>y[2]-x[2])[0],tp=G.P[top[0]];
+    return `<div style="margin-bottom:12px"><div class="mut">${MODE_N()[b.mode]} · ${L('Gün','Day')} ${b.day}</div><div class="big ${won?'grt':'rdt'}">${b.hs} – ${b.as}${b.ot?' <span class="pill">'+L('UZ','OT')+'</span>':''}</div><div>${esc(G.teams[b.h].name)} vs ${esc(G.teams[b.a].name)}</div>
+    ${tp?`<div class="mut">⭐ ${esc(tp.n)}: ${top[2]} ${L('sayı','pts')}, ${top[3]} ${L('rib','reb')}, ${top[4]} ${L('ast','ast')}</div>`:''}<button class="sm" style="margin-top:6px" onclick="openBox(${id})">📊 ${L('Maç istatistikleri','Box score')}</button></div>`}).join(''):`<p class="mut">${L('Henüz maç oynanmadı. Üstteki ▶ Günü Oynat ile başla.','No games played yet. Press ▶ Play Day above.')}</p>`;
   return `<div class="grid">
   <div class="card"><h3>${L('Takımın','Your Team')}</h3><div class="row"><span style="font-size:40px">${flag(U.c)}</span><div><h2 style="margin:0">${esc(U.name)}</h2><div class="mut">${cn(U.c)} · ${lgName(U.l)}</div></div></div>
    <div class="row" style="margin-top:12px"><span class="pill">${L('Sıra','Rank')}: <b>${pos}.</b></span><span class="pill">${U.w}${L('G','W')} – ${U.lo}${L('M','L')}</span><span class="pill">${L('Güç','Rating')}: <b>${rating(U).toFixed(1)}</b></span><span class="pill">Form: ${formHtml(U.form)||'–'}</span></div>
@@ -373,6 +406,7 @@ function panel(){
    <tr><td><b>${L('Günlük net','Daily net')}</b></td><td class="num"><b class="${inc-pay/DAYS>=0?'grt':'rdt'}">${money(Math.round(inc-pay/DAYS))}</b></td></tr>
    <tr><td>${L('Sezonluk maaş bordrosu','Season payroll')}</td><td class="num">${money(pay)}</td></tr>
    <tr><td>${L('Galibiyet primi','Win bonus')}</td><td class="num">+${money(Math.round(inc*.5))}</td></tr></table>
+   ${U.p.length<12?`<p class="rdt">⚠️ ${L(`Kadronda sadece ${U.p.length} oyuncu var. Transfer veya altyapıdan takviye yap.`,`Only ${U.p.length} players on your roster. Sign or promote players.`)}</p>`:''}
    ${exp?`<p class="rdt">⚠️ ${L(`${exp} oyuncunun sözleşmesi bu sezon bitiyor. Kadro sekmesinden uzatabilirsin.`,`${exp} contracts expire this season. Extend them in the Squad tab.`)}</p>`:''}</div>
   <div class="card"><h3>${L('Bugünkü maçlar','Today\'s Games')}</h3>${tm.length?tm.map(m=>`<div style="margin-bottom:10px"><span class="pill">${m.type}</span> ${m.home?'🏠':'✈️'} vs ${teamLink(m.opp)} <span class="mut">(${LEAGUES[m.opp.l].k} · ${L('güç','rating')} ${rating(m.opp).toFixed(1)})</span></div>`).join(''):`<p>${L('Sezon bitti. <b>Sezonu Tamamla</b> ile devam et.','Season over. Press <b>Finish Season</b>.')}</p>`}
    <p class="mut">${L('Gerçek oyunda maçlar her gün sabit saatte otomatik oynanacak. Prototipte günü sen ilerletiyorsun.','In the live game, matches will play automatically at a fixed time each day. In this prototype you advance the day.')}</p></div>
@@ -380,21 +414,33 @@ function panel(){
   <div class="card"><h3>${L('Son haberler','Latest News')}</h3><ul class="news">${G.news.slice(0,8).map(n=>`<li>${newsText(n)}</li>`).join('')}</ul></div></div>`;
 }
 function renameTeam(){const v=document.getElementById('rn').value.trim();if(v.length<3)return toast(L('En az 3 harf','At least 3 letters'));G.teams[G.user].name=v;save();render();toast(L('Takım adı güncellendi','Team renamed'))}
-const PH=()=>`<tr><th>${L('Poz','Pos')}</th><th>${L('Oyuncu','Player')}</th><th></th><th class="num">${L('Yaş','Age')}</th><th class="num">OVR</th><th class="num">POT</th><th class="num">${L('M','GP')}</th><th class="num">${L('SAY','PTS')}</th><th class="num">${L('RİB','REB')}</th><th class="num">${L('AST','AST')}</th><th class="num">${L('Maaş','Wage')}</th><th class="num">${L('Sözl.','Contract')}</th><th class="num">${L('Değer','Value')}</th><th></th></tr>`;
-function playerRow(p,own,actions,wageOverride){const g=p.g||1;
-  const ctr=p.y?'<span class="mut">'+L('genç','youth')+'</span>':p.t<0?'<span class="mut">–</span>':(p.c===1?`<span class="rdt"><b>${L('Son sezon','Final yr')}</b></span>`:`${p.c} ${L('sz','yr')}`);
-  return `<tr><td>${p.pos}</td><td>${esc(p.n)}</td><td>${flag(p.nat)}</td><td class="num">${p.a}</td><td class="num">${ovrTag(p.o)}</td><td class="num">${own?ovrTag(p.pt):scoutPot(p)}</td><td class="num">${p.g}</td><td class="num">${p.g?(p.pts/g).toFixed(1):'-'}</td><td class="num">${p.g?(p.reb/g).toFixed(1):'-'}</td><td class="num">${p.g?(p.ast/g).toFixed(1):'-'}</td><td class="num">${wageOverride||(p.y?'–':money(p.s))}</td><td class="num">${ctr}</td><td class="num">${money(value(p))}</td><td style="white-space:nowrap">${actions}</td></tr>`}
+const MODE_N=()=>[L('Lig','League'),'🌍 '+L('Uluslararası','International'),'🏆 '+L('Kupa','Cup')];
+function attrTag(v){const c=v>=85?'#ff7a1a':v>=72?'#2ecc71':v>=58?'#4aa3ff':v>=45?'#8b97a8':'#5a6372';return `<span style="color:${c};font-weight:600">${v}</span>`}
+const aShort=i=>LANG==='tr'?ATTR[i][1]:ATTR[i][2],aName=i=>LANG==='tr'?ATTR[i][3]:ATTR[i][4];
+function ctrTag(p){return p.y?'<span class="mut">'+L('genç','youth')+'</span>':p.t<0?'<span class="mut">–</span>':(p.c===1?`<span class="rdt"><b>${L('Son sezon','Final yr')}</b></span>`:`${p.c} ${L('sz','yr')}`)}
+const pName=p=>`<a href="#" onclick="openPlayer(${p.id});return false" style="color:inherit;text-decoration:underline dotted">${esc(p.n)}</a>`;
+function viewBtns(cur,setter){return `<div class="row" style="gap:4px">${[['gen',L('Genel','Overview')],['stat',L('İstatistik','Stats')],['attr',L('Özellikler','Attributes')]].map(([k,v])=>`<button class="sm ${cur===k?'pri':''}" onclick="${setter}='${k}';${setter==='UI.tmv'?'openTeam(UI.tmId)':'render()'}">${v}</button>`).join('')}</div>`}
+/* view: gen | stat | attr ; opts: own, act(p)->html, wage(p)->html */
+function playerTable(ps,view,o){o=o||{};const own=!!o.own,act=o.act||(()=>''),wage=o.wage||(p=>p.y?'–':money(p.s));
+  if(view==='stat'){const g=p=>p.g||1,f=(p,k)=>p.g?(p.S[k]/g(p)).toFixed(1):'-';
+    return `<div class="scroll"><table><tr><th>${L('Poz','Pos')}</th><th>${L('Oyuncu','Player')}</th><th class="num">${L('M','GP')}</th><th class="num">${L('DK','MIN')}</th><th class="num">${L('SAY','PTS')}</th><th class="num">${L('RİB','REB')}</th><th class="num">${L('AST','AST')}</th><th class="num">${L('TÇ','STL')}</th><th class="num">${L('BLK','BLK')}</th><th class="num">${L('TK','TOV')}</th><th class="num">FG%</th><th class="num">2P%</th><th class="num">3P</th><th class="num">3P%</th><th class="num">FT%</th></tr>
+    ${ps.map(p=>{const S=p.S;return `<tr><td>${p.pos}</td><td>${pName(p)}</td><td class="num">${p.g}</td><td class="num">${f(p,12)}</td><td class="num"><b>${f(p,0)}</b></td><td class="num">${f(p,1)}</td><td class="num">${f(p,2)}</td><td class="num">${f(p,3)}</td><td class="num">${f(p,4)}</td><td class="num">${f(p,5)}</td><td class="num">${pct(S[6],S[7])}</td><td class="num">${pct(S[6]-S[8],S[7]-S[9])}</td><td class="num mut">${S[8]}/${S[9]}</td><td class="num">${pct(S[8],S[9])}</td><td class="num">${pct(S[10],S[11])}</td></tr>`}).join('')}</table></div>`}
+  if(view==='attr')return `<div class="scroll"><table><tr><th>${L('Poz','Pos')}</th><th>${L('Oyuncu','Player')}</th><th class="num">OVR</th>${ATTR.map((a,i)=>`<th class="num" title="${aName(i)}">${aShort(i)}</th>`).join('')}</tr>
+    ${ps.map(p=>`<tr><td>${p.pos}</td><td>${pName(p)}</td><td class="num">${ovrTag(p.o)}</td>${p.at.map(v=>`<td class="num">${attrTag(v)}</td>`).join('')}</tr>`).join('')}</table></div>
+    <p class="mut" style="font-size:12px">${ATTR.map((a,i)=>`<b>${aShort(i)}</b> ${aName(i)}`).join(' · ')}</p>`;
+  return `<div class="scroll"><table><tr><th>${L('Poz','Pos')}</th><th>${L('Oyuncu','Player')}</th><th></th><th class="num">${L('Yaş','Age')}</th><th class="num">OVR</th><th class="num">POT</th><th class="num">${L('Maaş','Wage')}</th><th class="num">${L('Sözl.','Contract')}</th><th class="num">${L('Değer','Value')}</th><th></th></tr>
+   ${ps.map(p=>`<tr><td>${p.pos}</td><td>${pName(p)}</td><td>${flag(p.nat)}</td><td class="num">${p.a}</td><td class="num">${ovrTag(p.o)}</td><td class="num">${own?ovrTag(p.pt):scoutPot(p)}</td><td class="num">${wage(p)}</td><td class="num">${ctrTag(p)}</td><td class="num">${money(value(p))}</td><td style="white-space:nowrap">${act(p)}</td></tr>`).join('')}</table></div>`;
+}
 function kadro(){
-  const U=G.teams[G.user],ps=roster(U),ys=U.y.map(id=>G.P[id]).sort((a,b)=>b.pt-a.pt);
-  const act1=p=>(p.c===1?`<select id="cy${p.id}" class="sm" style="padding:3px">${[1,2,3,4].map(y=>`<option value="${y}" ${y===2?'selected':''}>${y} ${L('yıl','yr')}</option>`).join('')}</select> <button class="sm gr" onclick="act('renew',${p.id})" title="${L('Yeni maaş','New wage')}: ${money(renewAsk(p))}">${L('Uzat','Extend')} ${money(renewAsk(p))}</button> `:'')+`<button class="sm rd" onclick="act('release',${p.id})">${L('Bırak','Release')}</button>`;
-  return `<div class="card"><div class="row" style="justify-content:space-between"><h3>${L('A Takım','First Team')} (${ps.length}/${MAX_ROSTER})</h3>
+  const U=G.teams[G.user],ps=roster(U),ys=U.y.map(id=>G.P[id]).sort((a,b)=>b.pt-a.pt),v=UI.sqv||'gen';
+  const act1=p=>(p.c===1?`<select id="cy${p.id}" class="sm" style="padding:3px">${[1,2,3,4].map(y=>`<option value="${y}" ${y===2?'selected':''}>${y} ${L('yıl','yr')}</option>`).join('')}</select> <button class="sm gr" onclick="act('renew',${p.id})">${L('Uzat','Extend')} ${money(renewAsk(p))}</button> `:'')+`<button class="sm rd" onclick="act('release',${p.id})">${L('Bırak','Release')}</button>`;
+  return `<div class="card"><div class="row" style="justify-content:space-between"><h3>${L('A Takım','First Team')} (${ps.length}/${MAX_ROSTER})</h3>${viewBtns(v,'UI.sqv')}
   <div class="row"><label class="mut">${L('Tempo','Pace')}</label><select onchange="G.teams[G.user].tempo=+this.value;save()">${[L('Yavaş','Slow'),L('Normal','Normal'),L('Hızlı','Fast')].map((x,i)=>`<option value="${i}" ${U.tempo===i?'selected':''}>${x}</option>`).join('')}</select>
-  <label class="mut">${L('Oyun planı','Game plan')}</label><select onchange="G.teams[G.user].focus=+this.value;save()">${[[-1,L('Savunma','Defense')],[0,L('Dengeli','Balanced')],[1,L('Hücum','Offense')]].map(([v,x])=>`<option value="${v}" ${U.focus===v?'selected':''}>${x}</option>`).join('')}</select></div></div>
-  <p class="mut">${L(`En yüksek OVR'li 5 oyuncu ilk beş, ilk 10 oyuncu süre alır. Takım gücü: <b>${rating(U).toFixed(1)}</b> · Sezonluk bordro: <b>${money(payroll(U))}</b>. Sözleşmesi biten oyuncu sezon sonunda ayrılır; "Son sezon" yazanları uzatabilirsin (genç oyuncular uzatırken biraz zam ister).`,`Top 5 by OVR start, top 10 get minutes. Team rating: <b>${rating(U).toFixed(1)}</b> · Season payroll: <b>${money(payroll(U))}</b>. Players leave when their contract ends; extend those marked "Final yr" (younger players ask for a small raise).`)}</p>
-  <div class="scroll"><table>${PH()}${ps.map(p=>playerRow(p,true,act1(p))).join('')}</table></div></div>
-  <div class="card" style="margin-top:14px"><h3>🌱 ${L('Genç Takım','Youth Team')} (${ys.length}/${MAX_YOUTH})</h3><p class="mut">${L('Gençler maaş almaz. Her sezon sonunda yeni gençler gelir; 20 yaşına giren A takıma çıkar ya da kadro doluysa ayrılır. A takıma alınan gence 3 yıllık sözleşme verilir.','Prospects are unpaid. New prospects arrive each off-season; at 20 they join the first team or leave if the roster is full. Promoted prospects get a 3-year deal.')}</p>
-  <div class="scroll"><table>${PH()}${ys.map(p=>playerRow(p,true,`<button class="sm gr" onclick="act('promote',${p.id})">${L('A takıma al','Promote')}</button> <button class="sm rd" onclick="act('yrelease',${p.id})">${L('Gönder','Release')}</button>`,money(salary(p.o))+'*')).join('')||`<tr><td colspan=14 class="mut">${L('Genç oyuncu yok','No prospects')}</td></tr>`}</table></div>
-  <p class="mut" style="font-size:12px">* ${L('A takıma çıkarsa alacağı maaş','Wage if promoted')}</p></div>`;
+  <label class="mut">${L('Oyun planı','Game plan')}</label><select onchange="G.teams[G.user].focus=+this.value;save()">${[[-1,L('Savunma','Defense')],[0,L('Dengeli','Balanced')],[1,L('Hücum','Offense')]].map(([val,x])=>`<option value="${val}" ${U.focus===val?'selected':''}>${x}</option>`).join('')}</select></div></div>
+  <p class="mut">${L(`En yüksek OVR'li 5 oyuncu ilk beş, ilk 10 oyuncu süre alır. Takım gücü: <b>${rating(U).toFixed(1)}</b> · Sezonluk bordro: <b>${money(payroll(U))}</b>. Oyuncu adına tıklayınca kartı açılır.`,`Top 5 by OVR start, top 10 get minutes. Team rating: <b>${rating(U).toFixed(1)}</b> · Season payroll: <b>${money(payroll(U))}</b>. Click a name to open the player card.`)}</p>
+  ${playerTable(ps,v,{own:true,act:act1})}</div>
+  <div class="card" style="margin-top:14px"><h3>🌱 ${L('Genç Takım','Youth Team')} (${ys.length}/${MAX_YOUTH})</h3><p class="mut">${L('Gençler maaş almaz ve maçlarda oynamaz. 20 yaşına giren A takıma çıkar ya da kadro doluysa ayrılır. Maaş sütunu: A takıma çıkarsa alacağı maaş.','Prospects are unpaid and don\'t play. At 20 they join the first team or leave if the roster is full. Wage column: wage if promoted.')}</p>
+  ${ys.length?playerTable(ys,v==='stat'?'gen':v,{own:true,wage:p=>money(salary(p.o)),act:p=>`<button class="sm gr" onclick="act('promote',${p.id})">${L('A takıma al','Promote')}</button> <button class="sm rd" onclick="act('yrelease',${p.id})">${L('Gönder','Release')}</button>`}):`<p class="mut">${L('Genç oyuncu yok','No prospects')}</p>`}</div>`;
 }
 function tesis(){
   const U=G.teams[G.user];
@@ -415,27 +461,35 @@ function tableHtml(st,li,intl){const tier=intl?-1:LEAGUES[li].t;
     const w=intl?t.iw:t.w,l=intl?t.il:t.lo,pf=intl?t.ipf:t.pf,pa=intl?t.ipa:t.pa;
     return `<tr class="${cls}" onclick="openTeam(${t.id})"><td>${i+1}</td><td>${intl?flag(t.c)+' ':''}${esc(t.name)}${t.id===G.user?' <span class="or">('+L('SEN','YOU')+')</span>':''}</td><td class="num">${w+l}</td><td class="num">${w}</td><td class="num">${l}</td><td class="num">${pf}</td><td class="num">${pa}</td><td class="num">${pf-pa>0?'+':''}${pf-pa}</td><td class="num">${rating(t).toFixed(1)}</td><td>${intl?'':formHtml(t.form)}</td></tr>`}).join('')}</table></div>`}
 function leaders(ids){
-  const ps=[];ids.forEach(id=>G.teams[id].p.forEach(pid=>{const p=G.P[pid];if(p.g>=3)ps.push(p)}));
-  const top=(k,lbl)=>`<div><b class="or">${lbl}</b><table>${ps.slice().sort((a,b)=>b[k]/b.g-a[k]/a.g).slice(0,5).map(p=>`<tr><td>${esc(p.n)} <span class="mut">${esc(G.teams[p.t].name)}</span></td><td class="num">${(p[k]/p.g).toFixed(1)}</td></tr>`).join('')}</table></div>`;
-  return ps.length?`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${top('pts',L('Sayı','Points'))}${top('reb',L('Ribaunt','Rebounds'))}${top('ast',L('Asist','Assists'))}</div>`:`<p class="mut">${L('Birkaç maç oynanınca görünür.','Shows up after a few games.')}</p>`;
+  const ps=[];ids.forEach(id=>G.teams[id].p.forEach(pid=>{const p=G.P[pid];if(p.g>=3)ps.push(p)}));if(!ps.length)return `<p class="mut">${L('Birkaç maç oynanınca görünür.','Shows up after a few games.')}</p>`;
+  const per=(k)=>p=>p.S[k]/p.g,pc=(m,a,min)=>p=>p.S[a]/p.g>=min?p.S[m]/p.S[a]:-1;
+  const box_=(lbl,fn,fmt)=>`<div class="card" style="padding:10px"><b class="or">${lbl}</b><table>${ps.map(p=>[p,fn(p)]).filter(x=>x[1]>=0).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([p,v])=>`<tr><td>${pName(p)} <span class="mut">${esc(G.teams[p.t].name)}</span></td><td class="num">${fmt(v)}</td></tr>`).join('')}</table></div>`;
+  const f1=v=>v.toFixed(1),fp=v=>(v*100).toFixed(1)+'%';
+  return `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">${box_(L('Sayı','Points'),per(0),f1)}${box_(L('Ribaunt','Rebounds'),per(1),f1)}${box_(L('Asist','Assists'),per(2),f1)}${box_(L('Top Çalma','Steals'),per(3),f1)}${box_(L('Blok','Blocks'),per(4),f1)}${box_(L('Top Kaybı','Turnovers'),per(5),f1)}${box_('FG% (min 5 '+L('atış','FGA')+')',pc(6,7,5),fp)}${box_('2P% (min 4)',p=>(p.S[7]-p.S[9])/p.g>=4?(p.S[6]-p.S[8])/(p.S[7]-p.S[9]):-1,fp)}${box_('3P% (min 2)',pc(8,9,2),fp)}${box_(L('3\'lük isabet','3PM'),per(8),f1)}${box_('FT% (min 2)',pc(10,11,2),fp)}</div>`;
 }
 const countrySel=(v,on)=>`<select onchange="${on}">${COUNTRIES.map((c,i)=>`<option value="${i}" ${i===v?'selected':''}>${c.flag} ${cn(i)}</option>`).join('')}</select>`;
 function lig(){
-  const C=G.countries[UI.lc],lg=C.leagues[UI.ll],st=standings(lg.teams,false),tier=LEAGUES[UI.ll].t;
-  const leg=tier===0?L('🟢 1.: Şampiyon → Uluslararası Lig · 🔴 15-16: B liglerine düşer','🟢 1st: Champion → International League · 🔴 15-16: relegated to B'):tier===1?L('🟢 1.: A Ligi\'ne çıkar · 🔴 15-16: C liglerine düşer','🟢 1st: promoted to A · 🔴 15-16: relegated to C'):L('🟢 1.: B Ligi\'ne çıkar · (D ligleri üye arttığında açılacak)','🟢 1st: promoted to B · (D leagues open as the player base grows)');
+  const C=G.countries[UI.lc];
+  if(UI.lv==='league'){const lg=C.leagues[UI.ll],st=standings(lg.teams,false),tier=LEAGUES[UI.ll].t;
+    const leg=tier===0?L('🟢 1.: Şampiyon → Uluslararası Lig · 🔴 15-16: B liglerine düşer','🟢 1st: Champion → International League · 🔴 15-16: relegated to B'):tier===1?L('🟢 1.: A Ligi\'ne çıkar · 🔴 15-16: C liglerine düşer','🟢 1st: promoted to A · 🔴 15-16: relegated to C'):L('🟢 1.: B Ligi\'ne çıkar · (D ligleri üye arttığında açılacak)','🟢 1st: promoted to B · (D leagues open as the player base grows)');
+    return `<div class="row" style="margin-bottom:12px"><button onclick="UI.lv='country';render()">← ${flag(UI.lc)} ${cn(UI.lc)} ${L('ligleri','leagues')}</button>
+      <div class="row" style="gap:4px">${LEAGUES.map((_,li)=>`<button class="sm ${li===UI.ll?'pri':''}" onclick="UI.ll=${li};render()">${LEAGUES[li].k}</button>`).join('')}</div></div>
+    <div class="card"><h3>${flag(UI.lc)} ${lgName(UI.ll)}</h3><p class="mut">${leg} · ${L('Takıma tıklayınca kadrosu ve tesisleri açılır.','Click a team to see its roster and facilities.')}</p>${tableHtml(st,UI.ll,false)}</div>
+    <div class="card" style="margin-top:14px"><h3>${L('İstatistik liderleri (maç başı)','Stat leaders (per game)')}</h3>${leaders(lg.teams)}</div>`}
   const over=C.leagues.map((l,li)=>{const s2=standings(l.teams,false),avg=l.teams.reduce((x,id)=>x+rating(G.teams[id]),0)/16;
-    return `<div class="ccard ${li===UI.ll?'on':''}" style="text-align:left;padding:10px" onclick="UI.ll=${li};render()"><b>${lgName(li)}</b>${l.teams.includes(G.user)?' <span class="or">★</span>':''}<div class="mut" style="font-size:12px">${L('Ort. güç','Avg rating')} ${avg.toFixed(1)}</div><div style="font-size:12px">${L('Lider','Leader')}: ${esc(s2[0].name)}</div></div>`}).join('');
-  return `<div class="card"><div class="row" style="justify-content:space-between"><h3>${flag(UI.lc)} ${cn(UI.lc)} — ${L('tüm ligler','all leagues')}</h3>${countrySel(UI.lc,'UI.lc=+this.value;render()')}</div>
-   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">${over}</div></div>
-  <div class="card" style="margin-top:14px"><h3>${lgName(UI.ll)}</h3><p class="mut">${leg} · ${L('Takıma tıklayınca kadrosu ve tesisleri açılır.','Click a team to see its roster and facilities.')}</p>${tableHtml(st,UI.ll,false)}</div>
-  <div class="card" style="margin-top:14px"><h3>${L('İstatistik liderleri (maç başı)','Stat leaders (per game)')}</h3>${leaders(lg.teams)}</div>
-  <div class="card" style="margin-top:14px"><h3>${flag(UI.lc)} ${L('Geçmiş şampiyonlar','Past champions')}</h3>${G.hist.length?`<table><tr><th>${L('Sezon','Season')}</th><th>${L('A Ligi','A League')}</th><th>${L('Kupa','Cup')}</th></tr>${G.hist.map(h=>`<tr><td>${h.season}</td><td>${esc(h.champs[UI.lc])}</td><td>${esc(h.cups[UI.lc])}</td></tr>`).join('')}</table>`:`<p class="mut">${L('İlk sezon bitince burada görünür.','Appears after the first season.')}</p>`}</div>`;
+    return `<div class="ccard" style="text-align:left;padding:12px" onclick="UI.ll=${li};UI.lv='league';render()"><b>${lgName(li)}</b>${l.teams.includes(G.user)?' <span class="or">★</span>':''}<div class="mut" style="font-size:12px">${L('Ort. güç','Avg rating')} ${avg.toFixed(1)}</div><div style="font-size:12px">1. ${esc(s2[0].name)} <span class="mut">${s2[0].w}-${s2[0].lo}</span></div><div style="font-size:12px">2. ${esc(s2[1].name)} <span class="mut">${s2[1].w}-${s2[1].lo}</span></div><div class="or" style="font-size:12px;margin-top:4px">${L('Ligi aç →','Open league →')}</div></div>`}).join('');
+  const all=[];C.leagues.forEach(l=>l.teams.forEach(id=>G.teams[id].p.forEach(pid=>all.push(G.P[pid]))));all.sort((a,b)=>b.o-a.o);
+  return `<div class="row" style="margin-bottom:12px"><button onclick="UI.tab='dunya';render()">← ${L('Dünya','World')}</button>${countrySel(UI.lc,'UI.lc=+this.value;render()')}</div>
+  <div class="card"><h3>${flag(UI.lc)} ${cn(UI.lc)} — ${L('tüm ligler','all leagues')}</h3><p class="mut">${L('Bir lige tıkla, puan durumunu ve istatistik liderlerini gör.','Click a league to see its table and stat leaders.')}</p>
+   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">${over}</div></div>
+  <div class="grid" style="margin-top:14px"><div class="card"><h3>⭐ ${L('Ülkenin en iyi 10 oyuncusu','Top 10 players in the country')}</h3><table>${all.slice(0,10).map(p=>`<tr><td>${pName(p)} <span class="mut">${p.pos}</span></td><td class="mut">${esc(G.teams[p.t].name)} · ${LEAGUES[G.teams[p.t].l].k}</td><td class="num">${ovrTag(p.o)}</td></tr>`).join('')}</table></div>
+  <div class="card"><h3>${L('Geçmiş şampiyonlar','Past champions')}</h3>${G.hist.length?`<table><tr><th>${L('Sezon','Season')}</th><th>${L('A Ligi','A League')}</th><th>${L('Kupa','Cup')}</th></tr>${G.hist.map(h=>`<tr><td>${h.season}</td><td>${esc(h.champs[UI.lc])}</td><td>${esc(h.cups[UI.lc])}</td></tr>`).join('')}</table>`:`<p class="mut">${L('İlk sezon bitince burada görünür.','Appears after the first season.')}</p>`}</div></div>`;
 }
 function kupa(){
   if(UI.cc===null)UI.cc=G.teams[G.user].c;
   const ci=UI.cc,K=G.countries[ci].cup,RN=CUP_RN();
   const tieRow=t=>{const H=G.teams[t[0]],A=G.teams[t[1]],me=t[0]===G.user||t[1]===G.user,res=t[2]!==null;
-    return `<tr ${me?'class="me"':''}><td>${esc(H.name)} <span class="mut">${LEAGUES[H.l].k}</span></td><td class="num"><b>${res?`<span class="${t[2]>t[3]?'grt':''}">${t[2]}</span> – <span class="${t[3]>t[2]?'grt':''}">${t[3]}</span>`:'vs'}</b></td><td>${esc(A.name)} <span class="mut">${LEAGUES[A.l].k}</span></td></tr>`};
+    return `<tr ${me?'class="me"':''}><td>${esc(H.name)} <span class="mut">${LEAGUES[H.l].k}</span></td><td class="num"><b>${res?scoreLink(`<span class="${t[2]>t[3]?'grt':''}">${t[2]}</span> – <span class="${t[3]>t[2]?'grt':''}">${t[3]}</span>`,t[4]):'vs'}</b></td><td>${esc(A.name)} <span class="mut">${LEAGUES[A.l].k}</span></td></tr>`};
   const sortMe=a=>a.slice().sort((x,y)=>((y[0]===G.user||y[1]===G.user)-(x[0]===G.user||x[1]===G.user))||(G.teams[x[0]].l+G.teams[x[1]].l)-(G.teams[y[0]].l+G.teams[y[1]].l));
   const myCountry=ci===G.teams[G.user].c;
   let myPath='';if(myCountry){const steps=[];K.done.forEach((ties,r)=>{const t=ties.find(x=>x[0]===G.user||x[1]===G.user);if(t){const won=(t[0]===G.user)===(t[2]>t[3]);steps.push(`<span class="pill">${RN[r]}: <b class="${won?'grt':'rdt'}">${won?L('G','W'):L('M','L')}</b> ${t[0]===G.user?t[2]+'-'+t[3]:t[3]+'-'+t[2]}</span>`)}});
@@ -452,7 +506,7 @@ function kupa(){
 }
 function dunya(){
   const rows=COUNTRIES.map((c,ci)=>{const A=G.countries[ci].leagues[0],s=standings(A.teams,false),avg=A.teams.reduce((x,id)=>x+rating(G.teams[id]),0)/16,titles=G.hist.filter(h=>h.ic===ci).length;
-    return `<tr class="cl ${G.teams[G.user].c===ci?'me':''}" onclick="UI.lc=${ci};UI.ll=0;UI.tab='lig';render()"><td>${c.flag} ${cn(ci)}</td><td class="mut">${ccont(ci)}</td><td class="num">${avg.toFixed(1)}</td><td>${esc(s[0].name)} <span class="mut">${s[0].w}-${s[0].lo}</span></td><td class="num">${titles||'–'}</td></tr>`}).join('');
+    return `<tr class="cl ${G.teams[G.user].c===ci?'me':''}" onclick="UI.lc=${ci};UI.lv='country';UI.tab='lig';render()"><td>${c.flag} ${cn(ci)}</td><td class="mut">${ccont(ci)}</td><td class="num">${avg.toFixed(1)}</td><td>${esc(s[0].name)} <span class="mut">${s[0].w}-${s[0].lo}</span></td><td class="num">${titles||'–'}</td></tr>`}).join('');
   const best=Object.values(G.P).filter(p=>p.t>=0&&!p.y).sort((a,b)=>b.o-a.o).slice(0,15);
   return `<div class="grid"><div class="card"><h3>🌐 ${L('Dünya — 20 ülke','World — 20 countries')}</h3><p class="mut">${L(`Ülkeye tıkla, bütün liglerini gör. Toplam ${G.teams.length} takım, ${Object.keys(G.P).length.toLocaleString('tr-TR')} oyuncu.`,`Click a country to browse its leagues. ${G.teams.length} teams, ${Object.keys(G.P).length.toLocaleString('en-US')} players in total.`)}</p>
    <div class="scroll"><table><tr><th>${L('Ülke','Country')}</th><th>${L('Kıta','Continent')}</th><th class="num">${L('A Ligi gücü','A League rtg')}</th><th>${L('A Ligi lideri','A League leader')}</th><th class="num">🌍</th></tr>${rows}</table></div></div>
@@ -462,18 +516,18 @@ function dunya(){
 function fikstur(){
   const U=G.teams[G.user],lg=G.countries[U.c].leagues[U.l],idx=lg.teams.indexOf(U.id);
   const rows=lg.fx.map((rd,d)=>{const k=rd.findIndex(([h,a])=>h===idx||a===idx),[h,a]=rd[k],home=h===idx,opp=G.teams[lg.teams[home?a:h]],r=lg.res[d]&&lg.res[d][k];
-    let res='<span class="mut">–</span>';if(r){const my=home?r[0]:r[1],ot=home?r[1]:r[0];res=`<b class="${my>ot?'grt':'rdt'}">${my>ot?L('G','W'):L('M','L')} ${my}-${ot}</b>`}
+    let res='<span class="mut">–</span>';if(r){const my=home?r[0]:r[1],ot=home?r[1]:r[0];res=scoreLink(`<b class="${my>ot?'grt':'rdt'}">${my>ot?L('G','W'):L('M','L')} ${my}-${ot}</b>`,r[5])}
     return `<tr ${d===G.day?'class="me"':''}><td>${L('Gün','Day')} ${d+1}${CUP_DAYS.includes(d)?' 🏆':''}${G.intl.days.includes(d)&&G.intl.teams.includes(U.id)?' 🌍':''}</td><td>${home?'🏠':'✈️'}</td><td>${teamLink(opp)}</td><td>${res}</td></tr>`}).join('');
   const rd=UI.round===null?Math.max(0,G.day-1):UI.round,R=lg.fx[rd],RR=lg.res[rd];
-  return `<div class="grid"><div class="card"><h3>${L('Lig fikstürün','Your league fixtures')} — ${lgName(U.l)}</h3><p class="mut">🏆 ${L('kupa günü','cup day')} · 🌍 ${L('uluslararası maç','international game')}</p><table><tr><th>${L('Gün','Day')}</th><th></th><th>${L('Rakip','Opponent')}</th><th>${L('Sonuç','Result')}</th></tr>${rows}</table></div>
+  return `<div class="grid"><div class="card"><h3>${L('Lig fikstürün','Your league fixtures')} — ${lgName(U.l)}</h3><p class="mut">${L('Skora tıkla → maçın oyuncu istatistikleri.','Click a score → full box score.')} 🏆 ${L('kupa günü','cup day')} · 🌍 ${L('uluslararası maç','international game')}</p><table><tr><th>${L('Gün','Day')}</th><th></th><th>${L('Rakip','Opponent')}</th><th>${L('Sonuç','Result')}</th></tr>${rows}</table></div>
   <div class="card"><div class="row" style="justify-content:space-between"><h3>${L('Ligdeki tüm maçlar','All league games')}</h3><select onchange="UI.round=+this.value;render()">${lg.fx.map((_,i)=>`<option value="${i}" ${i===rd?'selected':''}>${L('Gün','Day')} ${i+1}</option>`).join('')}</select></div>
-  <table>${R.map(([h,a],k)=>{const r=RR&&RR[k],tp=r&&G.P[r[2]];return `<tr><td>${esc(G.teams[lg.teams[h]].name)}</td><td class="num"><b>${r?r[0]+' – '+r[1]:'vs'}</b></td><td>${esc(G.teams[lg.teams[a]].name)}</td><td class="mut">${tp?esc(tp.n)+' '+r[3]+' '+L('sayı','pts'):''}</td></tr>`}).join('')}</table></div></div>`;
+  <table>${R.map(([h,a],k)=>{const r=RR&&RR[k],tp=r&&G.P[r[2]];return `<tr><td>${esc(G.teams[lg.teams[h]].name)}</td><td class="num"><b>${r?scoreLink(r[0]+' – '+r[1],r[5]):'vs'}</b></td><td>${esc(G.teams[lg.teams[a]].name)}</td><td class="mut">${tp?esc(tp.n)+' '+r[3]+' '+L('sayı','pts'):''}</td></tr>`}).join('')}</table></div></div>`;
 }
 function intl(){
   const I=G.intl,st=standings(I.teams,true);let rd=-1;I.days.forEach((d,r)=>{if(d<G.day)rd=r});
   const show=Math.max(0,rd),R=I.fx[show],RR=I.res[show],next=I.days.find(d=>d>=G.day);
   return `<div class="grid"><div class="card"><h3>🌍 ${L('Uluslararası Lig','International League')}</h3><p class="mut">${L(`Geçen sezonun 20 A Ligi şampiyonu (ilk sezon: her ülkenin en güçlü takımı). Tek devre, ${I.fx.length} maç, sezona yayılmış. Şampiyona ${money(INTL_PRIZE)}.`,`Last season's 20 A League champions (season 1: each country's strongest club). Single round-robin, ${I.fx.length} games spread over the season. Winner gets ${money(INTL_PRIZE)}.`)}</p>${tableHtml(st,0,true)}</div>
-  <div class="card"><h3>${rd<0?L('1. tur (oynanmadı)','Round 1 (not played)'):L(`${show+1}. tur sonuçları`,`Round ${show+1} results`)}</h3><table>${R.map(([h,a],k)=>{const H=intlTeam(h),A=intlTeam(a);if(!H||!A)return '';const r=RR&&RR[k];return `<tr><td>${flag(H.c)} ${esc(H.name)}</td><td class="num"><b>${r?r[0]+' – '+r[1]:'vs'}</b></td><td>${flag(A.c)} ${esc(A.name)}</td></tr>`}).join('')}</table>
+  <div class="card"><h3>${rd<0?L('1. tur (oynanmadı)','Round 1 (not played)'):L(`${show+1}. tur sonuçları`,`Round ${show+1} results`)}</h3><table>${R.map(([h,a],k)=>{const H=intlTeam(h),A=intlTeam(a);if(!H||!A)return '';const r=RR&&RR[k];return `<tr><td>${flag(H.c)} ${esc(H.name)}</td><td class="num"><b>${r?scoreLink(r[0]+' – '+r[1],r[5]):'vs'}</b></td><td>${flag(A.c)} ${esc(A.name)}</td></tr>`}).join('')}</table>
   <p class="mut">${next!==undefined?L('Sıradaki tur: Gün ','Next round: Day ')+(next+1):L('Tüm turlar oynandı.','All rounds played.')}</p></div></div>`;
 }
 function transfer(){
@@ -482,8 +536,8 @@ function transfer(){
   return `<div class="card"><div class="row" style="justify-content:space-between"><h3>${L('Serbest Oyuncular','Free Agents')}</h3><div class="row">
   <select onchange="UI.faPos=this.value;render()"><option value="">${L('Tüm pozisyonlar','All positions')}</option>${POS.map(p=>`<option ${UI.faPos===p?'selected':''}>${p}</option>`).join('')}</select>
   <select onchange="UI.faC=this.value;render()"><option value="">${L('Tüm uyruklar','All nationalities')}</option>${COUNTRIES.map((c,i)=>`<option value="${i}" ${UI.faC===String(i)?'selected':''}>${c.flag} ${cn(i)}</option>`).join('')}</select></div></div>
-  <p class="mut">${L(`Kadro: ${U.p.length}/${MAX_ROSTER} · Kasa: ${money(G.money)} · Serbest oyuncu bir kerelik imza parası + sezonluk maaşla 3 yıllığına gelir. Başka takımdan oyuncu almak için Ligler'den takıma tıkla (değerin 1,5 katı). Gözlemci Ağı her seviyede fiyatları %2 düşürür.`,`Roster: ${U.p.length}/${MAX_ROSTER} · Cash: ${money(G.money)} · Free agents sign for 3 seasons: one-time signing bonus + season wage. To buy from another club, click it in Leagues (1.5× value). Each Scouting level cuts prices by 2%.`)}</p>
-  <div class="scroll"><table>${PH()}${Ls.map(p=>playerRow(p,false,`<button class="sm gr" onclick="act('sign',${p.id})">${L('İmzala','Sign')} ${money(signBonus(p))}</button>`,money(salary(p.o)))).join('')}</table></div></div>`;
+  <div style="margin-bottom:8px">${viewBtns(UI.fav||'gen','UI.fav')}</div><p class="mut">${L(`Kadro: ${U.p.length}/${MAX_ROSTER} · Kasa: ${money(G.money)} · Serbest oyuncu bir kerelik imza parası + sezonluk maaşla 3 yıllığına gelir. Başka takımdan oyuncu almak için Ligler'den takıma tıkla (değerin 1,5 katı). Gözlemci Ağı her seviyede fiyatları %2 düşürür.`,`Roster: ${U.p.length}/${MAX_ROSTER} · Cash: ${money(G.money)} · Free agents sign for 3 seasons: one-time signing bonus + season wage. To buy from another club, click it in Leagues (1.5× value). Each Scouting level cuts prices by 2%.`)}</p>
+  ${playerTable(Ls,UI.fav||'gen',{wage:p=>money(salary(p.o)),act:p=>`<button class="sm gr" onclick="act('sign',${p.id})">${L('İmzala','Sign')} ${money(signBonus(p))}</button>`})}</div></div>`;
 }
 function haber(){return `<div class="card"><h3>${L('Haberler','News')}</h3><ul class="news">${G.news.map(n=>`<li>${newsText(n)}</li>`).join('')}</ul></div>`}
 function nasil(){
@@ -518,13 +572,35 @@ function nasil(){
   <div class="card"><h3>${T('Yeni oyun','New game')}</h3><p class="mut">${T('Tüm dünya yeniden üretilir, kayıt silinir.','The whole world is regenerated and your save is deleted.')}</p><div id="ng"><button class="rd" onclick="confirmNew()">${T('Yeni oyun başlat','Start new game')}</button></div></div></div>`;
 }
 function confirmNew(){document.getElementById('ng').innerHTML=`<b>${L('Emin misin?','Are you sure?')}</b> <button class="rd" onclick="newGame()">${L('Evet, sıfırla','Yes, reset')}</button> <button onclick="render()">${L('Vazgeç','Cancel')}</button>`}
+function showModal(html){closeModal();const div=document.createElement('div');div.className='overlay';div.id='ov';div.onclick=e=>{if(e.target===div)closeModal()};div.innerHTML=`<div class="modal">${html}</div>`;document.body.appendChild(div)}
+const closeBtn=()=>`<button onclick="closeModal()">✕</button>`;
+const scoreLink=(html,bid)=>bid!=null&&G.bx[bid]?`<a href="#" onclick="openBox(${bid});return false" style="color:inherit;text-decoration:underline dotted">${html}</a>`:html;
 function openTeam(id){
-  const t=G.teams[id],own=id===G.user,ps=roster(t);
-  const div=document.createElement('div');div.className='overlay';div.id='ov';div.onclick=e=>{if(e.target===div)closeModal()};
-  div.innerHTML=`<div class="modal"><div class="row" style="justify-content:space-between"><div><h2 style="margin:0">${flag(t.c)} ${esc(t.name)}</h2><div class="mut">${lgName(t.l)} · ${t.w}${L('G','W')}-${t.lo}${L('M','L')} · ${L('güç','rating')} ${rating(t).toFixed(1)} · ${L('bordro','payroll')} ${money(payroll(t))} · ${own?L('senin takımın','your team'):'🤖 '+L('Bot yönetiyor','Bot-managed')}</div></div><button onclick="closeModal()">✕</button></div>
+  UI.tmId=id;const t=G.teams[id],own=id===G.user,ps=roster(t);
+  showModal(`<div class="row" style="justify-content:space-between"><div><h2 style="margin:0">${flag(t.c)} ${esc(t.name)}</h2><div class="mut">${lgName(t.l)} · ${t.w}${L('G','W')}-${t.lo}${L('M','L')} · ${L('güç','rating')} ${rating(t).toFixed(1)} · ${L('bordro','payroll')} ${money(payroll(t))} · ${own?L('senin takımın','your team'):'🤖 '+L('Bot yönetiyor','Bot-managed')}</div></div>${closeBtn()}</div>
   <div class="row" style="margin-top:8px">${FAC.map((f,i)=>`<span class="pill">${f.i} ${facName(i)}: <b>${t.f[i]}</b></span>`).join('')}</div>
-  <div class="scroll" style="margin-top:10px"><table>${PH()}${ps.map(p=>playerRow(p,own,own?'':`<button class="sm" onclick="act('buy',${p.id})">${L('Al','Buy')} ${money(buyPrice(p))}</button>`)).join('')}</table></div></div>`;
-  closeModal();document.body.appendChild(div);
+  <div style="margin-top:10px">${viewBtns(UI.tmv,'UI.tmv')}</div>
+  <div style="margin-top:8px">${playerTable(ps,UI.tmv,{own,act:p=>own?'':`<button class="sm" onclick="act('buy',${p.id})">${L('Al','Buy')} ${money(buyPrice(p))}</button>`})}</div>`);
+}
+function openPlayer(id){
+  const p=G.P[id];if(!p)return;const T=p.t>=0?G.teams[p.t]:null,own=p.t===G.user,S=p.S,g=p.g||1,f=k=>p.g?(S[k]/g).toFixed(1):'-';
+  const bar=i=>{const v=p.at[i],c=v>=85?'#ff7a1a':v>=72?'#2ecc71':v>=58?'#4aa3ff':v>=45?'#8b97a8':'#5a6372';return `<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><div style="width:150px;font-size:13px">${aName(i)}</div><div style="flex:1;height:8px;background:var(--panel2);border-radius:4px"><div style="width:${v}%;height:8px;border-radius:4px;background:${c}"></div></div><b style="width:28px;text-align:right;color:${c}">${v}</b></div>`};
+  let btn='';if(T&&!own&&!p.y)btn=`<button class="pri" onclick="act('buy',${p.id})">${L('Satın al','Buy')} ${money(buyPrice(p))}</button>`;else if(!T)btn=`<button class="pri" onclick="act('sign',${p.id});closeModal()">${L('İmzala','Sign')} ${money(signBonus(p))} + ${money(salary(p.o))}/${L('sezon','season')}</button>`;
+  showModal(`<div class="row" style="justify-content:space-between"><div><h2 style="margin:0">${flag(p.nat)} ${esc(p.n)}</h2><div class="mut">${p.pos} · ${p.a} ${L('yaş','yrs')} · ${T?esc(T.name)+' ('+LEAGUES[T.l].k+')':L('Serbest oyuncu','Free agent')}${p.y?' · 🌱 '+L('genç takım','youth team'):''}</div></div>${closeBtn()}</div>
+   <div class="row" style="margin:12px 0"><span class="pill">OVR ${ovrTag(p.o)}</span><span class="pill">POT ${own?ovrTag(p.pt):scoutPot(p)}</span><span class="pill">${L('Değer','Value')} <b>${money(value(p))}</b></span>${!p.y&&T?`<span class="pill">${L('Maaş','Wage')} <b>${money(p.s)}</b></span><span class="pill">${L('Sözleşme','Contract')}: ${ctrTag(p)}</span>`:''}</div>
+   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">${ATTR_GROUPS.map(([nm,ids])=>`<div class="card" style="padding:10px"><b class="or">${nm(L)}</b>${ids.map(bar).join('')}</div>`).join('')}</div>
+   <div class="card" style="margin-top:10px;padding:10px"><b class="or">${L('Bu sezon','This season')}</b> <span class="mut">(${p.g} ${L('maç','games')})</span>
+   <div class="row" style="margin-top:6px">${[[L('Sayı','PTS'),f(0)],[L('Rib','REB'),f(1)],[L('Ast','AST'),f(2)],[L('TÇ','STL'),f(3)],[L('Blk','BLK'),f(4)],[L('TK','TOV'),f(5)],['FG%',pct(S[6],S[7])],['2P%',pct(S[6]-S[8],S[7]-S[9])],['3P%',pct(S[8],S[9])+' <span class="mut">('+S[8]+'/'+S[9]+')</span>'],['FT%',pct(S[10],S[11])]].map(([k,v])=>`<span class="pill">${k}: <b>${v}</b></span>`).join('')}</div></div>
+   <div style="margin-top:12px">${btn}</div>`);
+}
+function openBox(id){
+  const b=G.bx[id];if(!b)return;
+  const tbl=(tid,lines,pts)=>{const T=G.teams[tid],tot=newS();lines.forEach(l=>{for(let k=0;k<12;k++)tot[k]+=l[k+2]});
+    return `<h3 style="margin-top:14px">${flag(T.c)} ${esc(T.name)} <span class="mut">${pts}</span></h3><div class="scroll"><table><tr><th>${L('Oyuncu','Player')}</th><th class="num">${L('DK','MIN')}</th><th class="num">${L('SAY','PTS')}</th><th class="num">${L('RİB','REB')}</th><th class="num">${L('AST','AST')}</th><th class="num">${L('TÇ','STL')}</th><th class="num">BLK</th><th class="num">${L('TK','TOV')}</th><th class="num">FG</th><th class="num">2P</th><th class="num">3P</th><th class="num">FT</th></tr>
+    ${lines.map(l=>{const p=G.P[l[0]];return `<tr><td>${p?pName(p)+' <span class="mut">'+p.pos+'</span>':'<span class="mut">—</span>'}</td><td class="num">${l[1]}</td><td class="num"><b>${l[2]}</b></td><td class="num">${l[3]}</td><td class="num">${l[4]}</td><td class="num">${l[5]}</td><td class="num">${l[6]}</td><td class="num">${l[7]}</td><td class="num">${l[8]}-${l[9]}</td><td class="num">${l[8]-l[10]}-${l[9]-l[11]}</td><td class="num">${l[10]}-${l[11]}</td><td class="num">${l[12]}-${l[13]}</td></tr>`}).join('')}
+    <tr style="font-weight:600"><td>${L('Toplam','Totals')}</td><td></td><td class="num">${tot[0]}</td><td class="num">${tot[1]}</td><td class="num">${tot[2]}</td><td class="num">${tot[3]}</td><td class="num">${tot[4]}</td><td class="num">${tot[5]}</td><td class="num">${pct(tot[6],tot[7])}</td><td class="num">${pct(tot[6]-tot[8],tot[7]-tot[9])}</td><td class="num">${pct(tot[8],tot[9])}</td><td class="num">${pct(tot[10],tot[11])}</td></tr></table></div>`};
+  showModal(`<div class="row" style="justify-content:space-between"><div><div class="mut">${MODE_N()[b.mode]} · ${L('Gün','Day')} ${b.day}</div><h2 style="margin:0">${esc(G.teams[b.h].name)} <span class="or">${b.hs} – ${b.as}</span> ${esc(G.teams[b.a].name)}${b.ot?' <span class="pill">'+L('UZ','OT')+'</span>':''}</h2></div>${closeBtn()}</div>
+   ${tbl(b.h,b.bh,b.hs)}${tbl(b.a,b.ba,b.as)}`);
 }
 function closeModal(){const o=document.getElementById('ov');if(o)o.remove()}
 function startScreen(){
@@ -536,7 +612,7 @@ function startScreen(){
     <p class="mut">${L('Gerçek oyunda yeni üyeler C liginden başlayacak. Prototipte istediğin ligden başlayabilirsin.','In the live game new members will start in a C league. In this prototype you can start anywhere.')}</p>
     <div class="scroll"><table><tr><th>${L('Takım','Team')}</th><th class="num">${L('Güç','Rating')}</th><th class="num">${L('Kadro','Roster')}</th><th class="num">${L('Bordro','Payroll')}</th><th class="num">${L('Başlangıç kasası','Starting cash')}</th><th></th></tr>
     ${lg.teams.map(id=>G.teams[id]).sort((a,b)=>rating(b)-rating(a)).map(t=>`<tr><td>${esc(t.name)}</td><td class="num">${rating(t).toFixed(1)}</td><td class="num">${t.p.length}</td><td class="num">${money(payroll(t))}</td><td class="num">${money(START_MONEY[LEAGUES[t.l].t])}</td><td><button class="sm pri" onclick="chooseTeam(${t.id})">${L('Bu takımı yönet','Manage')}</button></td></tr>`).join('')}</table></div></div>`}
-  return `<header><div class="logo">HOOP<b>WALL</b> MANAGER</div><div class="hinfo">${L('Basketbol menajerlik · prototip v3','Basketball management · prototype v3')}</div><div class="hbtn">${langBtn()}</div></header>
+  return `<header><div class="logo">HOOP<b>WALL</b> MANAGER</div><div class="hinfo">${L('Basketbol menajerlik · prototip v4','Basketball management · prototype v4')}</div><div class="hbtn">${langBtn()}</div></header>
   <main><div class="card"><h2>${L('Ülkeni seç','Choose your country')}</h2><p class="mut">${L('6 kıtadan 20 ülke · her ülkede 7 lig (A, B1–B2, C1–C4), 112 takım · tüm takımlar şimdilik bot.','20 countries on 6 continents · 7 leagues per country (A, B1–B2, C1–C4), 112 clubs · all clubs bot-managed for now.')}</p>
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">${COUNTRIES.map((c,i)=>`<div class="ccard ${ci===i?'on':''}" onclick="UI.startC=${i};render()"><div class="f">${c.flag}</div><b>${cn(i)}</b><div class="mut" style="font-size:12px">${ccont(i)}</div></div>`).join('')}</div></div>${teams}</main>`;
 }
@@ -546,6 +622,7 @@ function newGame(){G=null;DB.del();UI.startC=null;UI.cc=null;render()}
 
 document.getElementById('app').innerHTML=`<main><h2>${L('Yükleniyor…','Loading…')}</h2><p class="mut">${L('Dünya hazırlanıyor (20 ülke, 2240 takım).','Building the world (20 countries, 2,240 clubs).')}</p></main>`;
 DB.open().then(()=>DB.get()).then(g=>{if(g&&g.v===VERSION)G=g;setTimeout(render,30)});
+
 
 </script>
 </body>
