@@ -4,14 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hoopwall Manager — Online</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0e1116;--panel:#171c24;--panel2:#1f2632;--line:#2a3342;--txt:#e8ecf2;--mut:#8b97a8;--or:#ff7a1a;--or2:#ffb066;--gr:#2ecc71;--rd:#e74c3c;--bl:#4aa3ff}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 Inter,system-ui,sans-serif}
-h1,h2,h3{font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px;margin:0 0 10px}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+h1,h2,h3{font-family:'Barlow Condensed','Roboto Condensed','Arial Narrow','Liberation Sans Narrow',sans-serif,'Roboto Condensed','Arial Narrow','Liberation Sans Narrow',sans-serif;letter-spacing:.5px;margin:0 0 10px}
 h2{font-size:24px}h3{font-size:19px;color:var(--or2)}
 button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:8px 14px;background:var(--panel2);color:var(--txt)}
 button:hover{filter:brightness(1.2)}
@@ -20,7 +18,7 @@ button.sm{padding:4px 9px;font-size:12px}
 button.gr{background:#1d6b42}button.rd{background:#7a2a22}
 select,input{font:inherit;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
 header{position:sticky;top:0;z-index:5;background:linear-gradient(90deg,#1a1208,#0e1116 60%);border-bottom:2px solid var(--or);padding:10px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.logo{font-family:'Barlow Condensed';font-weight:800;font-size:26px;letter-spacing:1px}
+.logo{font-family:'Barlow Condensed','Roboto Condensed','Arial Narrow','Liberation Sans Narrow',sans-serif;font-weight:800;font-size:26px;letter-spacing:1px}
 .logo b{color:var(--or)}
 .hinfo{display:flex;gap:14px;color:var(--mut);font-size:13px;flex-wrap:wrap}
 .hinfo strong{color:var(--txt)}
@@ -43,7 +41,7 @@ tr.cl{cursor:pointer}tr.cl:hover td{background:var(--panel2)}
 .ovr{display:inline-block;min-width:30px;text-align:center;border-radius:6px;padding:1px 5px;font-weight:600;font-size:12px}
 .pill{display:inline-block;padding:2px 8px;border-radius:20px;background:var(--panel2);font-size:12px;color:var(--mut)}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.big{font-family:'Barlow Condensed';font-size:40px;font-weight:800}
+.big{font-family:'Barlow Condensed','Roboto Condensed','Arial Narrow','Liberation Sans Narrow',sans-serif;font-size:40px;font-weight:800}
 .ccard{background:var(--panel2);border:2px solid transparent;border-radius:12px;padding:14px;cursor:pointer;text-align:center}
 .ccard:hover,.ccard.on{border-color:var(--or)}
 .ccard .f{font-size:38px}
@@ -619,6 +617,10 @@ function claimTeam(uid,ci){
   addNews(t.id,`🤝 <b>${esc(t.name)}</b> takımının menajeri oldun! Hoş geldin.`,`🤝 You are the new manager of <b>${esc(t.name)}</b>! Welcome.`);
   return {team:t};
 }
+function releaseTeam(uid){const U=humans().find(t=>t.m.uid===uid);if(!U)return null;
+  delete U.m;U.tac=null;G.auc.forEach(a=>{if(a.ub)delete a.ub[U.id]});G.auc=G.auc.filter(a=>a.seller!==U.id);
+  const N=G.nat;Object.keys(N.coach).forEach(ci=>{if(N.coach[ci]===U.id){delete N.coach[ci];delete N.term[ci];delete N.usq[ci];delete N.utac[ci]}});
+  return U}
 function sanitizeOrders(t,o){o=o||{};const T=o.tactics||{},R=o.training||{},ids=new Set(t.p),all=new Set(t.p.concat(t.y));
   const tc=copy(DEF_TAC);
   if(['ins','per','bal','trn'].includes(T.off))tc.off=T.off;if(['man','zone','press'].includes(T.def))tc.def=T.def;
@@ -1085,7 +1087,8 @@ function nasil(){
    <li>${T('Hesaplar + ortak dünya: Supabase ücretsiz katmanı.','Accounts + shared world: Supabase free tier.')}</li>
    <li>${T('Günlük maç: her gün sabit saatte otomatik simülasyon.','Daily matchday: automatic simulation at a fixed time each day.')}</li>
    <li>${T('Bot devralma: yeni üye kendi ülkesinin C liginden bir bot takımı alır.','Bot takeover: new members take over a bot club in their country\'s C league.')}</li></ol></div>
-  <div class="card"><h3>📄 ${T('Hukuki metinler','Legal')}</h3><p><a href="#" onclick="openLegal('privacy');return false" style="color:var(--or)">${T('Gizlilik Politikası / KVKK Aydınlatma Metni','Privacy Policy')}</a></p><p><a href="#" onclick="openLegal('terms');return false" style="color:var(--or)">${T('Kullanım Şartları','Terms of Use')}</a></p></div>
+  <div class="card"><h3>📄 ${T('Hukuki metinler','Legal')}</h3><p><a href="#" onclick="openLegal('privacy');return false" style="color:var(--or)">${T('Gizlilik Politikası / KVKK Aydınlatma Metni','Privacy Policy')}</a></p><p><a href="#" onclick="openLegal('terms');return false" style="color:var(--or)">${T('Kullanım Şartları','Terms of Use')}</a></p><p><a href="#" onclick="openLegal('cookies');return false" style="color:var(--or)">${T('Çerez ve Yerel Depolama Politikası','Cookie & Local Storage Policy')}</a></p></div>
+  <div class="card"><h3>🗑️ ${T('Hesabım ve verilerim','My account & data')}</h3><p class="mut">${T('Hesabını ve sana ait tüm verileri (profil, taktik/antrenman ayarların, lig duvarı mesajların, kulüp haberlerin) kalıcı olarak silebilirsin. Kulübün bilgisayar yönetimine geçer.','You can permanently delete your account and all your data (profile, tactics/training settings, wall messages, club news). Your club goes back to computer control.')}</p><button style="background:#7a2020;color:#fff" onclick="deleteAccountAsk()">${T('Hesabımı sil','Delete my account')}</button></div>
   <div class="card" style="display:none"><h3>${T('Yeni oyun','New game')}</h3><p class="mut">${T('Tüm dünya yeniden üretilir, kayıt silinir.','The whole world is regenerated and your save is deleted.')}</p><div id="ng"><button class="rd" onclick="confirmNew()">${T('Yeni oyun başlat','Start new game')}</button></div></div></div>`;
 }
 function confirmNew(){document.getElementById('ng').innerHTML=`<b>${L('Emin misin?','Are you sure?')}</b> <button class="rd" onclick="newGame()">${L('Evet, sıfırla','Yes, reset')}</button> <button onclick="render()">${L('Vazgeç','Cancel')}</button>`}
@@ -1256,11 +1259,11 @@ privacy:{tr:`<h2>Gizlilik Politikası ve KVKK Aydınlatma Metni</h2><p class="mu
 <h3>5. Verilerin aktarıldığı taraflar ve yurt dışına aktarım</h3><p>Oyun, aşağıdaki hizmet sağlayıcılar (veri işleyenler) olmadan çalışamaz:</p><ul>
 <li><b>Supabase</b> (veritabanı ve üyelik sistemi): verilerin <b>Almanya (Frankfurt)</b>'daki sunucularda barındırılır. Supabase Pte. Ltd. (Singapur) ve alt hizmet sağlayıcıları (örneğin Amazon Web Services) işletme ve destek amacıyla ABD ve Singapur'dan erişim sağlayabilir.</li>
 <li><b>GitHub / Microsoft</b> (sitenin yayınlanması, ABD): siteyi açtığında IP adresin ve tarayıcı bilgilerin işlenir.</li>
-<li><b>jsDelivr</b> (yazılım kütüphanesinin dağıtımı) ve <b>Google Fonts</b> (yazı tipleri): sayfa yüklenirken IP adresin işlenir.</li></ul>
+<li><b>jsDelivr</b> (Supabase bağlantı kütüphanesinin dağıtımı): sayfa yüklenirken IP adresin ve tarayıcı bilgilerin işlenir.</li></ul>
 <p>Bu sağlayıcıların sunucuları Türkiye dışında olduğundan verilerin yurt dışına aktarılmaktadır. Aktarımlar KVKK'nın 9. maddesinde öngörülen usullere uygun olarak yapılır: bu kapsamda hizmet sağlayıcılarla Kurul'un ilan ettiği standart sözleşmenin düzenlenmesi ve Kurul'a bildirilmesi süreci yürütülmektedir. AB/AEA kullanıcıları için sağlayıcılar AB Standart Sözleşme Maddeleri'ni (SCC) uygular.</p>
 <p>Kişisel verilerin, yalnızca kanunen yetkili kamu kurum ve kuruluşlarının talebi hâlinde ve yasal zorunluluk ölçüsünde bu kurumlarla paylaşılabilir.</p>
-<h3>6. Saklama süresi</h3><p>Hesap verilerin hesabın açık olduğu sürece saklanır. Hesabını sildiğinde veya silinmesini istediğinde veriler 30 gün içinde silinir ya da anonim hâle getirilir. Teknik kayıtlar sağlayıcıların belirlediği süre boyunca (genellikle en fazla 90 gün) tutulur. Hesabın silindiğinde duvar mesajların da silinir.</p>
-<h3>7. Hakların</h3><p>KVKK m.11 uyarınca; verilerinin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, işlenme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme, aktarıldığı üçüncü kişileri bilme, eksik/yanlış işlenmişse düzeltilmesini, KVKK m.7 şartlarıyla silinmesini/yok edilmesini ve bu işlemlerin aktarılan kişilere bildirilmesini isteme, münhasıran otomatik sistemlerle analiz sonucu aleyhine bir sonucun ortaya çıkmasına itiraz etme ve kanuna aykırı işleme nedeniyle zarara uğrarsan zararın giderilmesini talep etme haklarına sahipsin. Başvurularını ${LEGAL_MAIL} adresine iletebilirsin; en geç 30 gün içinde ücretsiz yanıtlanır. Kişisel Verileri Koruma Kurulu'na şikâyette bulunma hakkın saklıdır.</p>
+<h3>6. Saklama süresi</h3><p>Hesap verilerin hesabın açık olduğu sürece saklanır. Oyundaki <b>“Hesabımı sil”</b> düğmesini kullandığında hesabın, profilin, taktik/antrenman ayarların, duvar mesajların ve kulüp haberlerin anında silinir; kulübün bilgisayar yönetimine geçer. E-postayla silme talebinde bulunursan veriler en geç 30 gün içinde silinir. Yedeklerde kalan kopyalar yedekleme döngüsü içinde kendiliğinden silinir. Teknik kayıtlar sağlayıcıların belirlediği süre boyunca (genellikle en fazla 90 gün) tutulur. Hesabın silindiğinde duvar mesajların da silinir.</p>
+<h3>7. Hakların</h3><p>KVKK m.11 uyarınca; verilerinin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, işlenme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme, aktarıldığı üçüncü kişileri bilme, eksik/yanlış işlenmişse düzeltilmesini, KVKK m.7 şartlarıyla silinmesini/yok edilmesini ve bu işlemlerin aktarılan kişilere bildirilmesini isteme, münhasıran otomatik sistemlerle analiz sonucu aleyhine bir sonucun ortaya çıkmasına itiraz etme ve kanuna aykırı işleme nedeniyle zarara uğrarsan zararın giderilmesini talep etme haklarına sahipsin. Hesabını ve verilerini silmek için oyunda <b>Nasıl Çalışır</b> sekmesindeki “Hesabımı sil” düğmesini kullanabilirsin. Diğer başvurularını ${LEGAL_MAIL} adresine iletebilirsin; en geç 30 gün içinde ücretsiz yanıtlanır. Kişisel Verileri Koruma Kurulu'na şikâyette bulunma hakkın saklıdır.</p>
 <p>AB kullanıcıları ayrıca GDPR kapsamında erişim, düzeltme, silme, işlemeyi kısıtlama, veri taşınabilirliği ve itiraz haklarına ve kendi ülkelerindeki veri koruma otoritesine şikâyet hakkına sahiptir.</p>
 <h3>8. Yaş sınırı</h3><p>16 yaşından küçükler oyunu ancak ebeveyn veya vasilerinin izniyle kullanabilir.</p>
 <h3>9. Güvenlik</h3><p>Şifreler tek yönlü özetlenerek saklanır, tüm bağlantılar şifrelidir (HTTPS) ve veritabanında her oyuncu yalnızca kendi kulübünü değiştirebilecek şekilde erişim kuralları uygulanır.</p>
@@ -1278,20 +1281,40 @@ en:`<h2>Privacy Policy</h2><p class="mut">Version: ${LEGAL_VERSION}</p>
 <h3>5. Recipients and international transfers</h3><p>The game relies on these service providers (processors):</p><ul>
 <li><b>Supabase</b> (database and authentication): data is hosted in <b>Germany (Frankfurt)</b>. Supabase Pte. Ltd. (Singapore) and its sub-processors (e.g. Amazon Web Services) may access it from the US and Singapore for operations and support.</li>
 <li><b>GitHub / Microsoft</b> (website hosting, US): your IP address and browser data are processed when you open the site.</li>
-<li><b>jsDelivr</b> (software library delivery) and <b>Google Fonts</b> (fonts): your IP address is processed when the page loads.</li></ul>
+<li><b>jsDelivr</b> (delivery of the Supabase connection library): your IP address and browser data are processed when the page loads.</li></ul>
 <p>Transfers outside Turkey follow the procedures of KVKK Art. 9; the standard contract published by the Turkish Data Protection Board is being put in place with the providers and notified to the Board. For EU/EEA users, providers apply the EU Standard Contractual Clauses (SCCs). Data is disclosed to public authorities only where legally required.</p>
-<h3>6. Retention</h3><p>Account data is kept while your account is active and deleted or anonymised within 30 days after you delete your account or ask us to. Technical logs are kept for the providers' retention periods (usually up to 90 days). Your wall posts are deleted with your account.</p>
-<h3>7. Your rights</h3><p>You may request access, correction, deletion, restriction, data portability and object to processing, and you may complain to your data protection authority (in Turkey: the Personal Data Protection Board). Send requests to ${LEGAL_MAIL}; we answer free of charge within 30 days.</p>
+<h3>6. Retention</h3><p>Account data is kept while your account is active. When you use the in-game <b>“Delete my account”</b> button, your account, profile, tactics/training settings, wall posts and club news are deleted immediately and your club returns to computer control. Requests by email are handled within 30 days. Copies in backups expire within the backup cycle. Technical logs are kept for the providers' retention periods (usually up to 90 days). Your wall posts are deleted with your account.</p>
+<h3>7. Your rights</h3><p>You may request access, correction, deletion, restriction, data portability and object to processing, and you may complain to your data protection authority (in Turkey: the Personal Data Protection Board). To delete your account and data, use the “Delete my account” button in the <b>How it works</b> tab. Send other requests to ${LEGAL_MAIL}; we answer free of charge within 30 days.</p>
 <h3>8. Age</h3><p>Players under 16 may only play with the permission of a parent or guardian.</p>
 <h3>9. Security</h3><p>Passwords are hashed, all connections are encrypted (HTTPS) and database rules ensure each player can only change their own club.</p>
 <h3>10. Changes</h3><p>If this policy changes, the version date changes and important updates are announced in the game.</p>`},
+cookies:{tr:`<h2>Çerez ve Yerel Depolama Politikası</h2><p class="mut">Sürüm: ${LEGAL_VERSION}</p>
+<p>Bu metin, Hoopwall Manager'ın tarayıcında neleri sakladığını açıklar. Kişisel verilerinin genel olarak nasıl işlendiği için <a href="#" onclick="openLegal('privacy');return false" style="color:var(--or)">Gizlilik Politikası ve KVKK Aydınlatma Metni</a>'ne bakabilirsin.</p>
+<h3>1. Çerez kullanıyor muyuz?</h3><p>Hoopwall Manager <b>reklam, pazarlama, analiz veya takip çerezi kullanmaz</b>. Google Analytics, Meta Pixel ya da benzeri bir ölçüm aracı yoktur. Bu yüzden sitede çerez onay bandı yoktur: kullandığımız tek şey oyunun çalışması için kesinlikle gerekli olan yerel depolamadır.</p>
+<h3>2. Tarayıcında sakladıklarımız</h3><ul>
+<li><b>Oturum anahtarı</b> (tarayıcının yerel depolama alanında, Supabase tarafından): giriş yaptığını hatırlamak için. Çıkış yaptığında silinir. <i>Zorunlu.</i></li>
+<li><b>Dil seçimi</b> (yerel depolama): seçtiğin dili (Türkçe/İngilizce) hatırlamak için. <i>Senin istediğin işlev için gerekli.</i></li>
+<li><b>Oyun dünyası önbelleği</b> (IndexedDB): her açılışta dünyayı baştan indirmemek için. Kişisel veri içermez, yalnızca oyun verisidir. <i>Zorunlu.</i></li></ul>
+<h3>3. Hukuki sebep</h3><p>Bunlar yalnızca senin açıkça istediğin hizmeti (oyunu) sunmak için kesinlikle gerekli olduğundan, KVKK m.5/2 (c) ve (f) kapsamında açık rıza aranmadan kullanılır. İleride isteğe bağlı bir çerez veya analiz aracı eklersek, önce açık rızanı soran bir çerez bandı ekleyecek ve bu metni güncelleyeceğiz.</p>
+<h3>4. Üçüncü taraflar</h3><p>Sayfa açılırken barındırma hizmeti (GitHub Pages) ve kütüphane dağıtım hizmeti (jsDelivr) teknik olarak IP adresini görür; bunlar çerez yerleştirmez. Ayrıntılar Gizlilik Politikası'nın 5. bölümündedir.</p>
+<h3>5. Nasıl silerim?</h3><p>Tarayıcının ayarlarından bu sitenin verilerini (çerezler ve site verileri) temizleyebilirsin. Bu durumda yeniden giriş yapman gerekir; oyun ilerlemen sunucuda saklandığı için kaybolmaz.</p>`,
+en:`<h2>Cookie &amp; Local Storage Policy</h2><p class="mut">Version: ${LEGAL_VERSION}</p>
+<p>This explains what Hoopwall Manager stores in your browser. For how personal data is processed in general, see the <a href="#" onclick="openLegal('privacy');return false" style="color:var(--or)">Privacy Policy</a>.</p>
+<h3>1. Do we use cookies?</h3><p>Hoopwall Manager uses <b>no advertising, marketing, analytics or tracking cookies</b>. There is no Google Analytics, Meta Pixel or similar tool, so there is no cookie banner: we only use storage that is strictly necessary for the game to work.</p>
+<h3>2. What we store in your browser</h3><ul>
+<li><b>Session token</b> (local storage, by Supabase): keeps you signed in. Removed when you sign out. <i>Strictly necessary.</i></li>
+<li><b>Language choice</b> (local storage): remembers Turkish/English. <i>Needed for the feature you asked for.</i></li>
+<li><b>Game world cache</b> (IndexedDB): avoids downloading the world on every visit. Game data only, no personal data. <i>Strictly necessary.</i></li></ul>
+<h3>3. Legal basis</h3><p>These are strictly necessary to provide the service you requested, so no consent is required (KVKK Art. 5/2 (c) and (f); the ePrivacy "strictly necessary" exemption). If we ever add optional cookies or analytics, we will first ask for your consent with a cookie banner and update this policy.</p>
+<h3>4. Third parties</h3><p>When the page loads, the hosting service (GitHub Pages) and the library CDN (jsDelivr) technically see your IP address; they set no cookies. See section 5 of the Privacy Policy.</p>
+<h3>5. How to delete</h3><p>You can clear this site's data in your browser settings. You will need to sign in again; your game progress is stored on the server and is not lost.</p>`},
 terms:{tr:`<h2>Kullanım Şartları</h2><p class="mut">Sürüm: ${LEGAL_VERSION}</p>
 <h3>1. Hizmet</h3><p>Hoopwall Manager, ${LEGAL_OWNER} tarafından sunulan ücretsiz, çevrimiçi bir basketbol menajerlik oyunudur. Oyun şu anda <b>beta</b> aşamasındadır; özellikler değişebilir, hatalar olabilir ve hizmet kesintisiz olacağı garantisi verilmeden "olduğu gibi" sunulur.</p>
 <h3>2. Hesap</h3><ul><li>Her kişi yalnızca <b>bir hesap</b> açabilir. Birden fazla hesapla oynamak yasaktır.</li><li>Üyelikte doğru bir e-posta adresi kullanmalı ve şifreni gizli tutmalısın. Hesabında yapılan işlemlerden sen sorumlusun.</li><li>16 yaşından küçüksen oyunu ebeveyn veya vasinin izniyle kullanabilirsin.</li></ul>
 <h3>3. Davranış kuralları</h3><p>Şunlar yasaktır: hakaret, taciz, nefret söylemi, müstehcen veya yasa dışı içerik paylaşmak; başkasının kimliğine bürünmek; spam ve reklam; bot, otomatik araç veya hile kullanmak; oyundaki hataları kendi lehine kullanmak (bulursan bildirmeni rica ederiz); sunuculara zarar vermeye çalışmak. Uygunsuz menajer adları ve kulüp adları değiştirilebilir.</p>
 <h3>4. Oyun içi para ve öğeler</h3><p>Oyun içi para (dolar), oyuncular, kulüpler ve diğer tüm oyun öğelerinin gerçek bir parasal değeri yoktur, gerçek paraya çevrilemez ve hesaplar arasında alınıp satılamaz. Kulüp ve oyuncular oyuna aittir; sana yalnızca oyunda kullanım hakkı tanınır.</p>
 <h3>5. Beta dönemi</h3><p>Beta süresince oyun dengesi değiştirilebilir ve gerektiğinde sezonlar veya dünya sıfırlanabilir. Bu tür önemli değişiklikler önceden duyurulmaya çalışılır.</p>
-<h3>6. Askıya alma ve fesih</h3><p>Bu şartları ihlal eden hesaplar uyarılabilir, askıya alınabilir veya kapatılabilir. Sen de hesabını istediğin zaman kapatabilirsin (${LEGAL_MAIL} adresine yazarak; oyun içi silme özelliği eklendiğinde oradan).</p>
+<h3>6. Askıya alma ve fesih</h3><p>Bu şartları ihlal eden hesaplar uyarılabilir, askıya alınabilir veya kapatılabilir. Sen de hesabını istediğin zaman kapatabilirsin (oyunda <b>Nasıl Çalışır</b> sekmesindeki “Hesabımı sil” düğmesiyle veya ${LEGAL_MAIL} adresine yazarak).</p>
 <h3>7. Fikri mülkiyet</h3><p>Oyunun yazılımı, tasarımı, adı ve logosu ${LEGAL_OWNER}'e aittir. Oyundaki kulüp ve oyuncu adları hayal ürünüdür; gerçek kişi veya kulüplerle benzerlik tesadüftür. Paylaştığın maç kartı görsellerini kişisel olarak sosyal medyada paylaşabilirsin.</p>
 <h3>8. Sorumluluğun sınırlandırılması</h3><p>Oyun ücretsiz sunulduğundan, kanunun izin verdiği ölçüde, hizmet kesintileri, veri kaybı veya oyun içi kayıplardan doğan zararlardan sorumluluk kabul edilmez. Tüketici olarak sahip olduğun yasal haklar saklıdır.</p>
 <h3>9. Değişiklikler</h3><p>Bu şartlar güncellenebilir; önemli değişiklikler oyun içinde duyurulur. Değişiklikten sonra oynamaya devam etmen güncel şartları kabul ettiğin anlamına gelir.</p>
@@ -1302,7 +1325,7 @@ en:`<h2>Terms of Use</h2><p class="mut">Version: ${LEGAL_VERSION}</p>
 <h3>3. Conduct</h3><p>Forbidden: insults, harassment, hate speech, obscene or illegal content; impersonation; spam and advertising; bots, automation or cheats; exploiting bugs (please report them); attempts to harm the servers. Inappropriate manager or club names may be changed.</p>
 <h3>4. Virtual currency and items</h3><p>In-game money, players, clubs and all other game items have no real-world monetary value, cannot be exchanged for real money and may not be traded between accounts. You receive a licence to use them in the game only.</p>
 <h3>5. Beta period</h3><p>During beta the game balance may change and seasons or the world may be reset when necessary. We will try to announce major changes in advance.</p>
-<h3>6. Suspension and termination</h3><p>Accounts that break these terms may be warned, suspended or closed. You can close your account at any time by writing to ${LEGAL_MAIL} (or in-game once that option exists).</p>
+<h3>6. Suspension and termination</h3><p>Accounts that break these terms may be warned, suspended or closed. You can close your account at any time with the “Delete my account” button in the <b>How it works</b> tab or by writing to ${LEGAL_MAIL}.</p>
 <h3>7. Intellectual property</h3><p>The game's software, design, name and logo belong to ${LEGAL_OWNER}. Club and player names are fictional; any resemblance to real people or clubs is coincidental. You may share your match-card images on social media for personal use.</p>
 <h3>8. Limitation of liability</h3><p>Because the game is free, to the extent permitted by law we accept no liability for outages, data loss or in-game losses. Your statutory consumer rights are not affected.</p>
 <h3>9. Changes</h3><p>These terms may be updated; important changes are announced in the game. Continuing to play after a change means you accept the updated terms.</p>
@@ -1336,7 +1359,19 @@ function authScreen(msg,mode){ME.authMode=mode||ME.authMode||'login';ME.screen=(
    <button class="pri" onclick="doAuth()">${sign?L('Üye ol','Sign up'):L('Giriş yap','Sign in')}</button></div>
    <p style="margin-top:12px">${sign?`${L('Hesabın var mı?','Have an account?')} <a href="#" onclick="authScreen('', 'login');return false" style="color:var(--or)">${L('Giriş yap','Sign in')}</a>`:`${L('Hesabın yok mu?','No account?')} <a href="#" onclick="authScreen('', 'signup');return false" style="color:var(--or)">${L('Üye ol','Sign up')}</a> · <a href="#" onclick="forgot();return false" class="mut">${L('Şifremi unuttum','Forgot password')}</a>`}</p>
    ${msg?`<p class="${/✅/.test(msg)?'grt':'rdt'}">${msg}</p>`:''}${legalLinks()}</div>`)}
-function legalLinks(){return `<p class="mut" style="font-size:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px"><a href="#" onclick="openLegal('privacy');return false" class="mut">${L('Gizlilik Politikası / KVKK Aydınlatma Metni','Privacy Policy')}</a> · <a href="#" onclick="openLegal('terms');return false" class="mut">${L('Kullanım Şartları','Terms of Use')}</a></p>`}
+function legalLinks(){return `<p class="mut" style="font-size:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px"><a href="#" onclick="openLegal('privacy');return false" class="mut">${L('Gizlilik Politikası / KVKK Aydınlatma Metni','Privacy Policy')}</a> · <a href="#" onclick="openLegal('terms');return false" class="mut">${L('Kullanım Şartları','Terms of Use')}</a> · <a href="#" onclick="openLegal('cookies');return false" class="mut">${L('Çerez Politikası','Cookie Policy')}</a></p>`}
+function deleteAccountAsk(){const w=L('SİL','DELETE');showModal(`<h3>🗑️ ${L('Hesabımı kalıcı olarak sil','Permanently delete my account')}</h3>
+  <p>${L('Bu işlem <b>geri alınamaz</b>. Hesabın, profilin, menajer adın, taktik ve antrenman ayarların, lig duvarı mesajların ve kulüp haberlerin silinir. Kulübün bilgisayar yönetimine geçer; aynı e-postayla yeniden üye olursan sıfırdan başlarsın.','This <b>cannot be undone</b>. Your account, profile, manager name, tactics and training settings, wall posts and club news will be deleted. Your club returns to computer control; if you sign up again with the same email you start from scratch.')}</p>
+  <p>${L('Onaylamak için kutuya büyük harflerle <b>SİL</b> yaz:','To confirm, type <b>DELETE</b> in the box:')}</p>
+  <input id="delw" autocomplete="off" style="width:100%;margin:6px 0 12px" placeholder="${w}">
+  <div class="row" style="gap:8px;justify-content:flex-end"><button onclick="closeModal()">${L('Vazgeç','Cancel')}</button><button id="delbtn" style="background:#7a2020;color:#fff" onclick="deleteAccount()">${L('Hesabımı sil','Delete my account')}</button></div>`)}
+async function deleteAccount(){const v=(document.getElementById('delw').value||'').trim().toLocaleUpperCase(LANG==='tr'?'tr':'en');
+  if(v!==L('SİL','DELETE'))return toast(L('Onay için SİL yazmalısın.','Type DELETE to confirm.'));
+  const b=document.getElementById('delbtn');b.disabled=true;b.textContent='…';
+  const {data,error}=await sb.functions.invoke(FN,{body:{action:'delete_account',confirm:'DELETE'}});
+  if(error||!data||!data.ok){b.disabled=false;b.textContent=L('Hesabımı sil','Delete my account');return toast(data&&data.error==='busy'?L('Şu an maç günü işleniyor, birkaç dakika sonra tekrar dene.','Match day is being processed, try again in a few minutes.'):L('Silinemedi, tekrar dene ya da bize yaz.','Could not delete, try again or contact us.'))}
+  try{await sb.auth.signOut()}catch(e){}try{indexedDB.deleteDatabase('hoopwall-online')}catch(e){}
+  closeModal();G=null;ME.user=null;ME.profile=null;authScreen(L('Hesabın ve verilerin silindi. Görüşmek üzere!','Your account and data have been deleted. Goodbye!'),'login')}
 async function doAuth(){const em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value;if(!em||pw.length<6)return authScreen(L('E-posta ve en az 6 karakterli şifre gir.','Enter email and a 6+ character password.'));
   app().querySelector('button.pri').disabled=true;
   if(ME.authMode==='signup'){if(!document.getElementById('ck1').checked||!document.getElementById('ck2').checked){app().querySelector('button.pri').disabled=false;return toast(L('Devam etmek için iki kutuyu da işaretlemelisin.','Please tick both boxes to continue.'))}
