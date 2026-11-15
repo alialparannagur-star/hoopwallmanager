@@ -1085,7 +1085,8 @@ function nasil(){
    <li>${T('Hesaplar + ortak dünya: Supabase ücretsiz katmanı.','Accounts + shared world: Supabase free tier.')}</li>
    <li>${T('Günlük maç: her gün sabit saatte otomatik simülasyon.','Daily matchday: automatic simulation at a fixed time each day.')}</li>
    <li>${T('Bot devralma: yeni üye kendi ülkesinin C liginden bir bot takımı alır.','Bot takeover: new members take over a bot club in their country\'s C league.')}</li></ol></div>
-  <div class="card"><h3>${T('Yeni oyun','New game')}</h3><p class="mut">${T('Tüm dünya yeniden üretilir, kayıt silinir.','The whole world is regenerated and your save is deleted.')}</p><div id="ng"><button class="rd" onclick="confirmNew()">${T('Yeni oyun başlat','Start new game')}</button></div></div></div>`;
+  <div class="card"><h3>📄 ${T('Hukuki metinler','Legal')}</h3><p><a href="#" onclick="openLegal('privacy');return false" style="color:var(--or)">${T('Gizlilik Politikası / KVKK Aydınlatma Metni','Privacy Policy')}</a></p><p><a href="#" onclick="openLegal('terms');return false" style="color:var(--or)">${T('Kullanım Şartları','Terms of Use')}</a></p></div>
+  <div class="card" style="display:none"><h3>${T('Yeni oyun','New game')}</h3><p class="mut">${T('Tüm dünya yeniden üretilir, kayıt silinir.','The whole world is regenerated and your save is deleted.')}</p><div id="ng"><button class="rd" onclick="confirmNew()">${T('Yeni oyun başlat','Start new game')}</button></div></div></div>`;
 }
 function confirmNew(){document.getElementById('ng').innerHTML=`<b>${L('Emin misin?','Are you sure?')}</b> <button class="rd" onclick="newGame()">${L('Evet, sıfırla','Yes, reset')}</button> <button onclick="render()">${L('Vazgeç','Cancel')}</button>`}
 function showModal(html){closeModal();const div=document.createElement('div');div.className='overlay';div.id='ov';div.onclick=e=>{if(e.target===div)closeModal()};div.innerHTML=`<div class="modal">${html}</div>`;document.body.appendChild(div)}
@@ -1234,6 +1235,81 @@ function chooseTeam(id){G.user=id;const t=G.teams[id];t.tac=JSON.parse(JSON.stri
   addNews(`🤝 <b>${esc(t.name)}</b> takımının menajeri oldun!`,`🤝 You are the new manager of <b>${esc(t.name)}</b>!`);save();render()}
 function newGame(){G=null;DB.del();UI.startC=null;UI.cc=null;render()}
 /* =====================================================================
+   HUKUKİ METİNLER (TR + EN) — Gizlilik Politikası / KVKK Aydınlatma Metni ve Kullanım Şartları
+   [KÖŞELİ PARANTEZ] içindeki yerler yayından önce doldurulmalıdır.
+   ===================================================================== */
+const LEGAL_VERSION='2026-11-15';
+const LEGAL_OWNER='Ali Alpar Annagür', LEGAL_MAIL='aaannagurapps@gmail.com';
+const LEGAL={
+privacy:{tr:`<h2>Gizlilik Politikası ve KVKK Aydınlatma Metni</h2><p class="mut">Sürüm: ${LEGAL_VERSION}</p>
+<p>Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun (KVKK) 10. maddesi kapsamında, Hoopwall Manager oyununu kullanırken kişisel verilerinin nasıl işlendiğini açıklar. Avrupa Birliği'nden oynayanlar için AB Genel Veri Koruma Tüzüğü (GDPR) kapsamındaki bilgiler de aşağıda yer alır.</p>
+<h3>1. Veri sorumlusu</h3><p>Hoopwall Manager, ${LEGAL_OWNER} tarafından geliştirilen ve işletilen çevrimiçi bir basketbol menajerlik oyunudur. İletişim: ${LEGAL_MAIL}</p>
+<h3>2. Hangi verileri işliyoruz?</h3><ul>
+<li><b>Hesap bilgileri:</b> e-posta adresin, şifren (şifren tek yönlü olarak özetlenir; biz dahil kimse göremez), menajer adın, dil tercihin.</li>
+<li><b>Oyun verileri:</b> yönettiğin kulüp, taktik ve antrenman kararların, transfer teklifleri, oyun içi istatistikler ve haberler.</li>
+<li><b>Mesajlar:</b> lig duvarına yazdığın mesajlar (ligindeki diğer oyuncular görür).</li>
+<li><b>Teknik veriler:</b> IP adresi, tarayıcı/cihaz bilgisi, giriş zamanları ve hata kayıtları. Bunlar hizmet sağlayıcılarımızın sunucularında otomatik olarak tutulur.</li>
+<li><b>Cihazında saklananlar:</b> oturum anahtarı, dil seçimi ve oyun dünyasının önbelleği (tarayıcının yerel depolama alanında). Reklam veya izleme çerezi <b>kullanmıyoruz</b>.</li></ul>
+<h3>3. Hangi amaçlarla?</h3><ul><li>Hesabını oluşturmak ve giriş yapmanı sağlamak,</li><li>oyunu sunmak (maç simülasyonu, ligler, turnuvalar, sıralamalar),</li><li>sosyal özellikleri (lig duvarı) çalıştırmak,</li><li>güvenliği sağlamak, hile ve kötüye kullanımı önlemek,</li><li>şifre sıfırlama gibi hesap bildirimlerini göndermek ve destek vermek,</li><li>yasal yükümlülükleri yerine getirmek.</li></ul>
+<p>Verilerini <b>satmıyoruz</b>, reklamverenlerle <b>paylaşmıyoruz</b> ve pazarlama için kullanmıyoruz. İleride böyle bir kullanım olursa ayrıca açık rızanı isteriz.</p>
+<h3>4. Hukuki sebepler ve toplama yöntemi</h3><p>Verilerin, üyelik formu ve oyun içi kullanım yoluyla elektronik ortamda, otomatik yöntemlerle toplanır. Hukuki sebepler (KVKK m.5/2): <b>(c)</b> bir sözleşmenin (Kullanım Şartları) kurulması ve ifası için gerekli olması; <b>(f)</b> güvenlik ve kötüye kullanımın önlenmesi gibi meşru menfaatlerimiz; <b>(ç)</b> hukuki yükümlülüklerimiz. AB kullanıcıları için karşılıkları GDPR m.6/1 (b), (f) ve (c)'dir.</p>
+<h3>5. Verilerin aktarıldığı taraflar ve yurt dışına aktarım</h3><p>Oyun, aşağıdaki hizmet sağlayıcılar (veri işleyenler) olmadan çalışamaz:</p><ul>
+<li><b>Supabase</b> (veritabanı ve üyelik sistemi): verilerin <b>Almanya (Frankfurt)</b>'daki sunucularda barındırılır. Supabase Pte. Ltd. (Singapur) ve alt hizmet sağlayıcıları (örneğin Amazon Web Services) işletme ve destek amacıyla ABD ve Singapur'dan erişim sağlayabilir.</li>
+<li><b>GitHub / Microsoft</b> (sitenin yayınlanması, ABD): siteyi açtığında IP adresin ve tarayıcı bilgilerin işlenir.</li>
+<li><b>jsDelivr</b> (yazılım kütüphanesinin dağıtımı) ve <b>Google Fonts</b> (yazı tipleri): sayfa yüklenirken IP adresin işlenir.</li></ul>
+<p>Bu sağlayıcıların sunucuları Türkiye dışında olduğundan verilerin yurt dışına aktarılmaktadır. Aktarımlar KVKK'nın 9. maddesinde öngörülen usullere uygun olarak yapılır: bu kapsamda hizmet sağlayıcılarla Kurul'un ilan ettiği standart sözleşmenin düzenlenmesi ve Kurul'a bildirilmesi süreci yürütülmektedir. AB/AEA kullanıcıları için sağlayıcılar AB Standart Sözleşme Maddeleri'ni (SCC) uygular.</p>
+<p>Kişisel verilerin, yalnızca kanunen yetkili kamu kurum ve kuruluşlarının talebi hâlinde ve yasal zorunluluk ölçüsünde bu kurumlarla paylaşılabilir.</p>
+<h3>6. Saklama süresi</h3><p>Hesap verilerin hesabın açık olduğu sürece saklanır. Hesabını sildiğinde veya silinmesini istediğinde veriler 30 gün içinde silinir ya da anonim hâle getirilir. Teknik kayıtlar sağlayıcıların belirlediği süre boyunca (genellikle en fazla 90 gün) tutulur. Hesabın silindiğinde duvar mesajların da silinir.</p>
+<h3>7. Hakların</h3><p>KVKK m.11 uyarınca; verilerinin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, işlenme amacını ve amaca uygun kullanılıp kullanılmadığını öğrenme, aktarıldığı üçüncü kişileri bilme, eksik/yanlış işlenmişse düzeltilmesini, KVKK m.7 şartlarıyla silinmesini/yok edilmesini ve bu işlemlerin aktarılan kişilere bildirilmesini isteme, münhasıran otomatik sistemlerle analiz sonucu aleyhine bir sonucun ortaya çıkmasına itiraz etme ve kanuna aykırı işleme nedeniyle zarara uğrarsan zararın giderilmesini talep etme haklarına sahipsin. Başvurularını ${LEGAL_MAIL} adresine iletebilirsin; en geç 30 gün içinde ücretsiz yanıtlanır. Kişisel Verileri Koruma Kurulu'na şikâyette bulunma hakkın saklıdır.</p>
+<p>AB kullanıcıları ayrıca GDPR kapsamında erişim, düzeltme, silme, işlemeyi kısıtlama, veri taşınabilirliği ve itiraz haklarına ve kendi ülkelerindeki veri koruma otoritesine şikâyet hakkına sahiptir.</p>
+<h3>8. Yaş sınırı</h3><p>16 yaşından küçükler oyunu ancak ebeveyn veya vasilerinin izniyle kullanabilir.</p>
+<h3>9. Güvenlik</h3><p>Şifreler tek yönlü özetlenerek saklanır, tüm bağlantılar şifrelidir (HTTPS) ve veritabanında her oyuncu yalnızca kendi kulübünü değiştirebilecek şekilde erişim kuralları uygulanır.</p>
+<h3>10. Değişiklikler</h3><p>Bu metin güncellenirse sürüm tarihi değişir; önemli değişiklikler oyun içinde duyurulur.</p>`,
+en:`<h2>Privacy Policy</h2><p class="mut">Version: ${LEGAL_VERSION}</p>
+<p>This policy explains how your personal data is processed when you play Hoopwall Manager. It is written to meet Turkey's Personal Data Protection Law No. 6698 (KVKK) and, for players in the European Union, the General Data Protection Regulation (GDPR).</p>
+<h3>1. Controller</h3><p>Hoopwall Manager is an online basketball management game developed and operated by ${LEGAL_OWNER}. Contact: ${LEGAL_MAIL}</p>
+<h3>2. Data we process</h3><ul><li><b>Account:</b> email address, password (stored only as a one-way hash — nobody, including us, can read it), manager name, language.</li>
+<li><b>Game data:</b> your club, tactical and training decisions, transfer bids, in-game statistics and news.</li><li><b>Messages:</b> posts on your league wall (visible to other managers in your league).</li>
+<li><b>Technical data:</b> IP address, browser/device information, sign-in times and error logs, recorded automatically by our service providers.</li>
+<li><b>Stored on your device:</b> session token, language choice and a cache of the game world (browser local storage). We use <b>no</b> advertising or tracking cookies.</li></ul>
+<h3>3. Purposes</h3><ul><li>Creating your account and signing you in;</li><li>providing the game (match simulation, leagues, tournaments, rankings);</li><li>social features (league wall);</li><li>security and preventing cheating and abuse;</li><li>account notices such as password resets, and support;</li><li>complying with legal obligations.</li></ul>
+<p>We do <b>not</b> sell your data, share it with advertisers or use it for marketing. If that ever changes we will ask for your consent first.</p>
+<h3>4. Legal bases</h3><p>Data is collected electronically through sign-up and gameplay. Legal bases: performance of a contract (Terms of Use) — GDPR Art. 6(1)(b), KVKK Art. 5(2)(c); legitimate interests such as security — GDPR Art. 6(1)(f), KVKK Art. 5(2)(f); legal obligations — GDPR Art. 6(1)(c), KVKK Art. 5(2)(ç).</p>
+<h3>5. Recipients and international transfers</h3><p>The game relies on these service providers (processors):</p><ul>
+<li><b>Supabase</b> (database and authentication): data is hosted in <b>Germany (Frankfurt)</b>. Supabase Pte. Ltd. (Singapore) and its sub-processors (e.g. Amazon Web Services) may access it from the US and Singapore for operations and support.</li>
+<li><b>GitHub / Microsoft</b> (website hosting, US): your IP address and browser data are processed when you open the site.</li>
+<li><b>jsDelivr</b> (software library delivery) and <b>Google Fonts</b> (fonts): your IP address is processed when the page loads.</li></ul>
+<p>Transfers outside Turkey follow the procedures of KVKK Art. 9; the standard contract published by the Turkish Data Protection Board is being put in place with the providers and notified to the Board. For EU/EEA users, providers apply the EU Standard Contractual Clauses (SCCs). Data is disclosed to public authorities only where legally required.</p>
+<h3>6. Retention</h3><p>Account data is kept while your account is active and deleted or anonymised within 30 days after you delete your account or ask us to. Technical logs are kept for the providers' retention periods (usually up to 90 days). Your wall posts are deleted with your account.</p>
+<h3>7. Your rights</h3><p>You may request access, correction, deletion, restriction, data portability and object to processing, and you may complain to your data protection authority (in Turkey: the Personal Data Protection Board). Send requests to ${LEGAL_MAIL}; we answer free of charge within 30 days.</p>
+<h3>8. Age</h3><p>Players under 16 may only play with the permission of a parent or guardian.</p>
+<h3>9. Security</h3><p>Passwords are hashed, all connections are encrypted (HTTPS) and database rules ensure each player can only change their own club.</p>
+<h3>10. Changes</h3><p>If this policy changes, the version date changes and important updates are announced in the game.</p>`},
+terms:{tr:`<h2>Kullanım Şartları</h2><p class="mut">Sürüm: ${LEGAL_VERSION}</p>
+<h3>1. Hizmet</h3><p>Hoopwall Manager, ${LEGAL_OWNER} tarafından sunulan ücretsiz, çevrimiçi bir basketbol menajerlik oyunudur. Oyun şu anda <b>beta</b> aşamasındadır; özellikler değişebilir, hatalar olabilir ve hizmet kesintisiz olacağı garantisi verilmeden "olduğu gibi" sunulur.</p>
+<h3>2. Hesap</h3><ul><li>Her kişi yalnızca <b>bir hesap</b> açabilir. Birden fazla hesapla oynamak yasaktır.</li><li>Üyelikte doğru bir e-posta adresi kullanmalı ve şifreni gizli tutmalısın. Hesabında yapılan işlemlerden sen sorumlusun.</li><li>16 yaşından küçüksen oyunu ebeveyn veya vasinin izniyle kullanabilirsin.</li></ul>
+<h3>3. Davranış kuralları</h3><p>Şunlar yasaktır: hakaret, taciz, nefret söylemi, müstehcen veya yasa dışı içerik paylaşmak; başkasının kimliğine bürünmek; spam ve reklam; bot, otomatik araç veya hile kullanmak; oyundaki hataları kendi lehine kullanmak (bulursan bildirmeni rica ederiz); sunuculara zarar vermeye çalışmak. Uygunsuz menajer adları ve kulüp adları değiştirilebilir.</p>
+<h3>4. Oyun içi para ve öğeler</h3><p>Oyun içi para (dolar), oyuncular, kulüpler ve diğer tüm oyun öğelerinin gerçek bir parasal değeri yoktur, gerçek paraya çevrilemez ve hesaplar arasında alınıp satılamaz. Kulüp ve oyuncular oyuna aittir; sana yalnızca oyunda kullanım hakkı tanınır.</p>
+<h3>5. Beta dönemi</h3><p>Beta süresince oyun dengesi değiştirilebilir ve gerektiğinde sezonlar veya dünya sıfırlanabilir. Bu tür önemli değişiklikler önceden duyurulmaya çalışılır.</p>
+<h3>6. Askıya alma ve fesih</h3><p>Bu şartları ihlal eden hesaplar uyarılabilir, askıya alınabilir veya kapatılabilir. Sen de hesabını istediğin zaman kapatabilirsin (${LEGAL_MAIL} adresine yazarak; oyun içi silme özelliği eklendiğinde oradan).</p>
+<h3>7. Fikri mülkiyet</h3><p>Oyunun yazılımı, tasarımı, adı ve logosu ${LEGAL_OWNER}'e aittir. Oyundaki kulüp ve oyuncu adları hayal ürünüdür; gerçek kişi veya kulüplerle benzerlik tesadüftür. Paylaştığın maç kartı görsellerini kişisel olarak sosyal medyada paylaşabilirsin.</p>
+<h3>8. Sorumluluğun sınırlandırılması</h3><p>Oyun ücretsiz sunulduğundan, kanunun izin verdiği ölçüde, hizmet kesintileri, veri kaybı veya oyun içi kayıplardan doğan zararlardan sorumluluk kabul edilmez. Tüketici olarak sahip olduğun yasal haklar saklıdır.</p>
+<h3>9. Değişiklikler</h3><p>Bu şartlar güncellenebilir; önemli değişiklikler oyun içinde duyurulur. Değişiklikten sonra oynamaya devam etmen güncel şartları kabul ettiğin anlamına gelir.</p>
+<h3>10. Uygulanacak hukuk ve iletişim</h3><p>Bu şartlara Türkiye Cumhuriyeti hukuku uygulanır; tüketici iseniz ikamet ettiğiniz yerdeki yetkili tüketici mercilerine başvurma hakkınız saklıdır. Soru ve başvurular: ${LEGAL_MAIL}</p>`,
+en:`<h2>Terms of Use</h2><p class="mut">Version: ${LEGAL_VERSION}</p>
+<h3>1. Service</h3><p>Hoopwall Manager is a free online basketball management game provided by ${LEGAL_OWNER}. The game is in <b>beta</b>: features may change, bugs may occur and the service is provided "as is" without a guarantee of uninterrupted availability.</p>
+<h3>2. Account</h3><ul><li>One person, <b>one account</b>. Playing with multiple accounts is forbidden.</li><li>Use a valid email address and keep your password secret. You are responsible for activity on your account.</li><li>If you are under 16 you need a parent's or guardian's permission.</li></ul>
+<h3>3. Conduct</h3><p>Forbidden: insults, harassment, hate speech, obscene or illegal content; impersonation; spam and advertising; bots, automation or cheats; exploiting bugs (please report them); attempts to harm the servers. Inappropriate manager or club names may be changed.</p>
+<h3>4. Virtual currency and items</h3><p>In-game money, players, clubs and all other game items have no real-world monetary value, cannot be exchanged for real money and may not be traded between accounts. You receive a licence to use them in the game only.</p>
+<h3>5. Beta period</h3><p>During beta the game balance may change and seasons or the world may be reset when necessary. We will try to announce major changes in advance.</p>
+<h3>6. Suspension and termination</h3><p>Accounts that break these terms may be warned, suspended or closed. You can close your account at any time by writing to ${LEGAL_MAIL} (or in-game once that option exists).</p>
+<h3>7. Intellectual property</h3><p>The game's software, design, name and logo belong to ${LEGAL_OWNER}. Club and player names are fictional; any resemblance to real people or clubs is coincidental. You may share your match-card images on social media for personal use.</p>
+<h3>8. Limitation of liability</h3><p>Because the game is free, to the extent permitted by law we accept no liability for outages, data loss or in-game losses. Your statutory consumer rights are not affected.</p>
+<h3>9. Changes</h3><p>These terms may be updated; important changes are announced in the game. Continuing to play after a change means you accept the updated terms.</p>
+<h3>10. Governing law and contact</h3><p>These terms are governed by the laws of the Republic of Türkiye; consumers keep the right to turn to the competent consumer bodies where they live. Questions: ${LEGAL_MAIL}</p>`}};
+function openLegal(k){showModal(`<div class="row" style="justify-content:flex-end">${closeBtn()}</div><div class="legal" style="line-height:1.6">${L(LEGAL[k].tr,LEGAL[k].en)}</div>`)}
+
+/* =====================================================================
    ONLINE İSTEMCİ: giriş, takım sahiplenme, dünyayı veritabanından yükleme
    ===================================================================== */
 const SB_URL='https://mfclbyglewnksakxxpvq.supabase.co';
@@ -1255,12 +1331,16 @@ function authScreen(msg,mode){ME.authMode=mode||ME.authMode||'login';ME.screen=(
   app().innerHTML=shell(`<div class="card" style="margin-top:30px"><h2>${sign?L('Üye ol','Create account'):L('Giriş yap','Sign in')}</h2>
    <p class="mut">${L('20 ülke, 2240 takım. Kendi kulübünü al, her akşam maç günü!','20 countries, 2,240 clubs. Take over a club — matchday every evening!')}</p>
    <div style="display:grid;gap:10px;margin-top:12px"><input id="em" type="email" placeholder="E-posta / Email" autocomplete="email"><input id="pw" type="password" placeholder="${L('Şifre (en az 6 karakter)','Password (min 6 chars)')}" autocomplete="${sign?'new-password':'current-password'}" onkeydown="if(event.key==='Enter')doAuth()">
+   ${sign?`<label class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="ck1" style="margin-top:3px;flex:none"> <span style="flex:1">${L('<a href="#" onclick="openLegal(\'terms\');return false" style="color:var(--or)">Kullanım Şartları</a>\'nı okudum ve kabul ediyorum.','I have read and accept the <a href="#" onclick="openLegal(\'terms\');return false" style="color:var(--or)">Terms of Use</a>.')}</span></label>
+   <label class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" id="ck2" style="margin-top:3px;flex:none"> <span style="flex:1">${L('<a href="#" onclick="openLegal(\'privacy\');return false" style="color:var(--or)">Gizlilik Politikası ve KVKK Aydınlatma Metni</a>\'ni okudum. Oyunun çalışması için verilerimin yurt dışındaki sunuculara (Almanya, ABD, Singapur) aktarılacağı konusunda bilgilendirildim.','I have read the <a href="#" onclick="openLegal(\'privacy\');return false" style="color:var(--or)">Privacy Policy</a> and understand my data is processed on servers outside my country (Germany, US, Singapore) to run the game.')}</span></label>`:''}
    <button class="pri" onclick="doAuth()">${sign?L('Üye ol','Sign up'):L('Giriş yap','Sign in')}</button></div>
    <p style="margin-top:12px">${sign?`${L('Hesabın var mı?','Have an account?')} <a href="#" onclick="authScreen('', 'login');return false" style="color:var(--or)">${L('Giriş yap','Sign in')}</a>`:`${L('Hesabın yok mu?','No account?')} <a href="#" onclick="authScreen('', 'signup');return false" style="color:var(--or)">${L('Üye ol','Sign up')}</a> · <a href="#" onclick="forgot();return false" class="mut">${L('Şifremi unuttum','Forgot password')}</a>`}</p>
-   ${msg?`<p class="${/✅/.test(msg)?'grt':'rdt'}">${msg}</p>`:''}</div>`)}
+   ${msg?`<p class="${/✅/.test(msg)?'grt':'rdt'}">${msg}</p>`:''}${legalLinks()}</div>`)}
+function legalLinks(){return `<p class="mut" style="font-size:12px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px"><a href="#" onclick="openLegal('privacy');return false" class="mut">${L('Gizlilik Politikası / KVKK Aydınlatma Metni','Privacy Policy')}</a> · <a href="#" onclick="openLegal('terms');return false" class="mut">${L('Kullanım Şartları','Terms of Use')}</a></p>`}
 async function doAuth(){const em=document.getElementById('em').value.trim(),pw=document.getElementById('pw').value;if(!em||pw.length<6)return authScreen(L('E-posta ve en az 6 karakterli şifre gir.','Enter email and a 6+ character password.'));
   app().querySelector('button.pri').disabled=true;
-  if(ME.authMode==='signup'){const {data,error}=await sb.auth.signUp({email:em,password:pw,options:{data:{lang:LANG},emailRedirectTo:location.origin+location.pathname}});
+  if(ME.authMode==='signup'){if(!document.getElementById('ck1').checked||!document.getElementById('ck2').checked){app().querySelector('button.pri').disabled=false;return toast(L('Devam etmek için iki kutuyu da işaretlemelisin.','Please tick both boxes to continue.'))}
+    const {data,error}=await sb.auth.signUp({email:em,password:pw,options:{data:{lang:LANG,terms:LEGAL_VERSION},emailRedirectTo:location.origin+location.pathname}});
     if(error)return authScreen(errText(error.message));if(!data.session)return authScreen(L('✅ Üyelik oluşturuldu! E-postana gelen onay linkine tıkla, sonra giriş yap.','✅ Account created! Click the confirmation link in your email, then sign in.'),'login');return boot()}
   const {error}=await sb.auth.signInWithPassword({email:em,password:pw});if(error)return authScreen(errText(error.message));boot()}
 async function forgot(){const em=(document.getElementById('em')||{}).value;if(!em)return authScreen(L('Önce e-postanı yaz.','Type your email first.'));
@@ -1268,13 +1348,21 @@ async function forgot(){const em=(document.getElementById('em')||{}).value;if(!e
 function errText(m){m=String(m||'');if(/Invalid login/i.test(m))return L('E-posta veya şifre hatalı.','Wrong email or password.');if(/already registered/i.test(m))return L('Bu e-posta zaten kayıtlı, giriş yap.','This email is already registered — sign in.');if(/Email not confirmed/i.test(m))return L('E-postanı henüz onaylamadın. Gelen kutunu kontrol et.','Email not confirmed yet. Check your inbox.');if(/rate limit/i.test(m))return L('Çok fazla deneme, birkaç dakika bekle.','Too many attempts, wait a few minutes.');return m}
 async function logout(){await sb.auth.signOut();G=null;ME.user=null;ME.profile=null;authScreen('', 'login')}
 
+function termsScreen(){ME.screen=()=>termsScreen();app().innerHTML=shell(`<div class="card" style="margin-top:20px"><h2>📄 ${L('Güncel şartlar','Updated terms')}</h2>
+  <p class="mut">${L('Devam etmeden önce güncel metinleri onaylaman gerekiyor.','Please accept the current documents to continue.')}</p>
+  <label class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:8px;font-size:13px;margin:8px 0"><input type="checkbox" id="ck1" style="margin-top:3px;flex:none"> <span style="flex:1">${L('<a href="#" onclick="openLegal(\'terms\');return false" style="color:var(--or)">Kullanım Şartları</a>\'nı okudum ve kabul ediyorum.','I have read and accept the <a href="#" onclick="openLegal(\'terms\');return false" style="color:var(--or)">Terms of Use</a>.')}</span></label>
+  <label class="row" style="flex-wrap:nowrap;align-items:flex-start;gap:8px;font-size:13px;margin:8px 0"><input type="checkbox" id="ck2" style="margin-top:3px;flex:none"> <span style="flex:1">${L('<a href="#" onclick="openLegal(\'privacy\');return false" style="color:var(--or)">Gizlilik Politikası ve KVKK Aydınlatma Metni</a>\'ni okudum. Oyunun çalışması için verilerimin yurt dışındaki sunuculara (Almanya, ABD, Singapur) aktarılacağı konusunda bilgilendirildim.','I have read the <a href="#" onclick="openLegal(\'privacy\');return false" style="color:var(--or)">Privacy Policy</a> and understand my data is processed on servers outside my country (Germany, US, Singapore) to run the game.')}</span></label>
+  <button class="pri" style="width:100%" onclick="acceptTerms()">${L('Onayla ve devam et','Accept and continue')}</button>
+  <p class="mut" style="font-size:12px;margin-top:10px"><a href="#" onclick="logout();return false" class="mut">${L('Çıkış yap','Sign out')}</a></p></div>`)}
+async function acceptTerms(){if(!document.getElementById('ck1').checked||!document.getElementById('ck2').checked)return toast(L('Devam etmek için iki kutuyu da işaretlemelisin.','Please tick both boxes to continue.'));
+  const {error}=await sb.from('profiles').update({terms_version:LEGAL_VERSION,terms_accepted_at:new Date().toISOString()}).eq('id',ME.user.id);if(error)return toast(error.message);ME.loading=false;boot()}
 /* ---------- takım sahiplenme ---------- */
 function claimScreen(msg){ME.screen=()=>claimScreen();app().innerHTML=shell(`<div class="card" style="margin-top:20px"><h2>🏀 ${L('Kulübünü al','Take over a club')}</h2>
   <p class="mut">${L('Ülkeni seç: o ülkenin C liglerinden boştaki bir kulüp sana verilecek. Oradan A Ligi\'ne tırman!','Pick your country: you\'ll get a free club from its C leagues. Climb to the A League!')}</p>
   <label class="mut">${L('Menajer adın (herkese görünür)','Manager name (public)')}</label><input id="un" maxlength="24" placeholder="${L('ör. ali_coach','e.g. coach_mike')}" style="width:100%;margin:6px 0 12px">
   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">${COUNTRIES.map((c,i)=>`<div class="ccard ${ME.pickC===i?'on':''}" style="padding:10px" onclick="ME.pickC=${i};document.querySelectorAll('.ccard').forEach((e,j)=>e.classList.toggle('on',j===${i}))"><div style="font-size:28px">${flag(i)}</div><b style="font-size:13px">${cn(i)}</b></div>`).join('')}</div>
   <button class="pri" style="width:100%;margin-top:14px" onclick="doClaim()">${L('Kulübümü ver!','Give me a club!')}</button>${msg?`<p class="rdt">${msg}</p>`:''}
-  <p class="mut" style="font-size:12px;margin-top:10px"><a href="#" onclick="logout();return false" class="mut">${L('Çıkış yap','Sign out')}</a></p></div>`)}
+  <p class="mut" style="font-size:12px;margin-top:10px"><a href="#" onclick="logout();return false" class="mut">${L('Çıkış yap','Sign out')}</a></p>${legalLinks()}</div>`)}
 async function doClaim(){const un=document.getElementById('un').value.trim();if(ME.pickC==null)return claimScreen(L('Bir ülke seç.','Pick a country.'));if(un.length<3)return claimScreen(L('Menajer adı en az 3 karakter olmalı.','Manager name must be 3+ characters.'));
   app().querySelector('button.pri').disabled=true;app().querySelector('button.pri').textContent='⏳';
   const {data,error}=await sb.functions.invoke(FN,{body:{action:'claim',country:ME.pickC,username:un}});
@@ -1339,6 +1427,7 @@ async function checkUpdate(){if(!G||!ME.meta)return;const m=(await sb.from('worl
 async function boot(){if(ME.loading)return;ME.loading=true;
   try{const {data:{session}}=await sb.auth.getSession();if(!session){ME.loading=false;return authScreen()}
     ME.user=session.user;ME.profile=(await sb.from('profiles').select('*').eq('id',ME.user.id).maybeSingle()).data||{};
+    if(ME.profile.terms_version!==LEGAL_VERSION){ME.loading=false;return termsScreen()}
     if(ME.profile.team_id==null){ME.loading=false;return claimScreen()}
     await loadWorldClient();ME.loading=false;render();
   }catch(e){ME.loading=false;app().innerHTML=shell(`<div class="card" style="margin-top:30px"><h2>⚠️ ${L('Bir sorun oldu','Something went wrong')}</h2><p class="mut">${esc(e.message||e)}</p><button class="pri" onclick="location.reload()">${L('Yeniden dene','Retry')}</button> <button onclick="logout()">${L('Çıkış','Sign out')}</button></div>`)}}
