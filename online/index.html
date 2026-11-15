@@ -575,9 +575,9 @@ function aucResolve(a){const prev=a.lt,prevP=a.price,c=[];
   if(a.lt!==prev||a.price!==prevP)a.hist.unshift([a.lt,a.price,G.tick]);if(a.hist.length>12)a.hist.length=12;
   if(prev!=null&&prev!==a.lt&&isHuman(G.teams[prev])){const p=G.P[a.pid];addNews(prev,`🔨 Açık artırmada geçildin: <b>${esc(p.n)}</b> için yeni fiyat ${money(a.price)}.`,`🔨 Outbid on <b>${esc(p.n)}</b>: price now ${money(a.price)}.`)}
 }
-function newAuction(pid,seller,start,days){if(aucOf(pid))return aucOf(pid);
+function newAuction(pid,seller,start,days,noBot){if(aucOf(pid))return aucOf(pid);
   const a={id:G.aucN++,pid,seller,start:Math.max(1000,Math.round(start/1000)*1000),end:G.tick+days,ub:{},bm:0,bt:null,bseq:0,b2:0,lt:null,price:0,bids:0,hist:[]};
-  a.price=a.start;G.auc.push(a);botInterest(a,.55);return a}
+  a.price=a.start;G.auc.push(a);if(!noBot)botInterest(a,.55);return a}
 function botInterest(a,chance){const p=G.P[a.pid];if(!p||Math.random()>chance)return;
   const tier=p.o>=66?0:p.o>=57?1:2,cands=[];
   for(let k=0;k<8;k++){const ci=Math.random()<.5?p.nat:rnd(0,COUNTRIES.length-1),C=G.countries[ci],lis=LEAGUES.map((_,i)=>i).filter(i=>LEAGUES[i].t===tier),lg=C.leagues[pick(lis)],t=G.teams[pick(lg.teams)];
@@ -635,9 +635,9 @@ function sanitizeOrders(t,o){o=o||{};const T=o.tactics||{},R=o.training||{},ids=
 
 /* ---------- dünyayı kayıtlara bölme / birleştirme ---------- */
 const r3=x=>Math.round(x*1000)/1000;
-function splitWorld(){
-  const countries=COUNTRIES.map((_,ci)=>({leagues:G.countries[ci].leagues,cup:G.countries[ci].cup,teams:[],P:{}}));
-  for(const t of G.teams){const c=countries[t.c];c.teams.push(t);for(const id of t.p.concat(t.y)){const p=G.P[id];if(p){if(p.tp)p.tp=p.tp.map(r3);c.P[id]=p}}}
+function splitWorld(cis){
+  const countries=[];(cis||COUNTRIES.map((_,i)=>i)).forEach(ci=>{countries[ci]={leagues:G.countries[ci].leagues,cup:G.countries[ci].cup,teams:[],P:{}}});
+  for(const t of G.teams){if(!t)continue;const c=countries[t.c];if(!c)continue;c.teams.push(t);for(const id of t.p.concat(t.y)){const p=G.P[id];if(p){if(p.tp)p.tp=p.tp.map(r3);c.P[id]=p}}}
   const faP={};for(const id of G.fa)if(G.P[id])faP[id]=G.P[id];
   const bx={};Object.entries(G.bx).forEach(([k,b])=>{if(b.day>=G.day-1)bx[k]=b});
   const global={v:G.v,intl:G.intl,nat:G.nat,auc:G.auc,aucN:G.aucN,seq:G.seq,fa:G.fa,faP,hist:G.hist,nid:G.nid,bx,bxN:G.bxN};
@@ -649,6 +649,69 @@ function assembleWorld(meta,countryData,global){
   Object.assign(G.P,global.faP||{});
   return G;
 }
+
+/* ---------- çevrimiçi işlemler (sunucuda uygulanır; mesajlar [tr,en]) ---------- */
+const TPC=112,teamCountry=tid=>Math.floor(tid/TPC);
+function applyAct(U,a){const M=U.m,E=(tr,en)=>({err:[tr,en]}),OK=(tr,en,x)=>Object.assign({ok:[tr,en]},x||{});
+  const id=Number.isInteger(a.id)?a.id:null,p=id!=null?G.P[id]:null,broke=()=>M.money<0;
+  const DEBT=E('Kasa eksideyken bunu yapamazsın.','Not possible while in debt.');
+  switch(a.type){
+  case 'build':{if(!Number.isInteger(a.id)||!FAC[a.id])return E('Geçersiz tesis.','Invalid facility.');const lv=U.f[a.id];
+    if(lv>=10)return E('Zaten maksimum seviye.','Already at max level.');if(M.builds.some(b=>b.i===a.id))return E('Bu tesis zaten inşaatta.','Already under construction.');
+    if(M.builds.length>=MAX_BUILDS)return E(`Aynı anda en fazla ${MAX_BUILDS} inşaat.`,`Max ${MAX_BUILDS} constructions at once.`);
+    const c=facCost(lv);if(broke())return DEBT;if(M.money<c)return E('Bütçe yetmiyor: '+money(c),'Not enough money: '+money(c));
+    M.money-=c;M.builds.push({i:a.id,left:facDays(lv)});
+    addNews(U.id,`🚧 ${FAC[a.id].tr} seviye ${lv+1} inşaatı başladı (${facDays(lv)} gün, ${money(c)}).`,`🚧 ${FAC[a.id].en} level ${lv+1} construction started (${facDays(lv)} days, ${money(c)}).`);
+    return OK('İnşaat başladı!','Construction started!')}
+  case 'promote':{if(!p||!U.y.includes(id))return E('Oyuncu bulunamadı.','Player not found.');if(U.p.length>=MAX_ROSTER)return E('Kadro 15 kişi, önce birini çıkar.','Roster is full (15).');
+    U.y=U.y.filter(x=>x!==id);p.y=false;p.s=salary(p.o);p.c=3;U.p.push(id);return OK(p.n+' A takıma çıktı (3 yıl)',p.n+' promoted (3-year deal)')}
+  case 'release':{if(!p||!U.p.includes(id))return E('Oyuncu bulunamadı.','Player not found.');if(U.p.length<=8)return E('Kadroda en az 8 oyuncu kalmalı.','Keep at least 8 players.');
+    G.auc=G.auc.filter(x=>x.pid!==id);release(U,id);return OK(p.n+' serbest bırakıldı',p.n+' released')}
+  case 'yrelease':{if(!p||!U.y.includes(id))return E('Oyuncu bulunamadı.','Player not found.');U.y=U.y.filter(x=>x!==id);delete G.P[id];return OK('Altyapı oyuncusu gönderildi','Prospect released')}
+  case 'renew':{if(!p||!U.p.includes(id))return E('Oyuncu bulunamadı.','Player not found.');if(broke())return DEBT;const yrs=[1,2,3].includes(a.yrs)?a.yrs:2,ask=renewAsk(p);p.s=ask;p.c=1+yrs;
+    addNews(U.id,`✍️ ${esc(p.n)} ${yrs} yıl daha imzaladı (${money(ask)}/sezon).`,`✍️ ${esc(p.n)} extended for ${yrs} more seasons (${money(ask)}/season).`);return OK('Sözleşme uzatıldı','Contract extended')}
+  case 'buy':{if(!p||p.t<0||p.t===U.id)return E('Oyuncu bulunamadı.','Player not found.');const T=G.teams[p.t];if(!T)return E('Oyuncu bulunamadı.','Player not found.');
+    if(isHuman(T))return E('Başka bir menajerin oyuncusunu doğrudan alamazsın; satışa çıkarırsa açık artırmaya katılabilirsin.','You can\'t buy directly from another manager; bid if they list him.');
+    const v=buyPrice(p,U);if(U.p.length>=MAX_ROSTER)return E('Kadro dolu (15).','Roster is full (15).');if(T.p.length<=10)return E('Bu takım daha fazla oyuncu satmıyor.','This team won\'t sell more players.');
+    if(broke())return DEBT;if(M.money<v)return E('Bütçe yetmiyor.','Not enough money.');
+    M.money-=v;T.p=T.p.filter(x=>x!==id);G.auc=G.auc.filter(x=>x.pid!==id);p.t=U.id;if(p.c<2)p.c=3;U.p.push(id);
+    addNews(U.id,`💰 ${esc(p.n)} transfer edildi: ${esc(T.name)} → sen (${money(v)})`,`💰 Bought ${esc(p.n)} from ${esc(T.name)} (${money(v)})`);return OK('Transfer tamam!','Transfer done!',{touch:[T.c]})}
+  case 'bid':{const A=G.auc.find(x=>x.id===a.aid);if(!A||A.end<=G.tick)return E('Açık artırma bitti.','Auction ended.');
+    if(A.seller===U.id)return E('Kendi oyuncuna teklif veremezsin.','You can\'t bid on your own player.');
+    const amt=Math.round((+a.amt||0)/1000)*1000,mine=A.ub&&A.ub[U.id]?A.ub[U.id][0]:0,lead=A.lt===U.id,min=lead?Math.max(A.price,mine+1000):aucMinBid(A);
+    if(!Number.isFinite(amt)||amt<min||amt>1e9)return E('En az '+money(min),'Minimum bid: '+money(min));
+    if(broke())return E('Kasa eksideyken teklif veremezsin.','Not possible while in debt.');
+    if(committed(U.id,A)+amt>M.money)return E('Kasandaki para (önde olduğun diğer tekliflerle birlikte) yetmiyor.','Not enough cash (including your other leading bids).');
+    const leadCnt=G.auc.filter(x=>x!==A&&x.lt===U.id).length;if(U.p.length+leadCnt>=MAX_ROSTER)return E('Kadro + önde olduğun açık artırmalar 15\'i geçemez.','Roster + leading bids can\'t exceed 15.');
+    A.ub=A.ub||{};A.ub[U.id]=[amt,G.seq++];A.bids++;aucResolve(A);
+    return A.lt===U.id?OK('Öndesin! Fiyat: '+money(A.price),'You lead! Price: '+money(A.price)):OK('Başka bir takımın üst limiti daha yüksek. Fiyat: '+money(A.price),'Another club\'s max is higher. Price: '+money(A.price))}
+  case 'fa':{const q=G.P[a.pid];if(!q||q.t!==-1||!G.fa.includes(a.pid))return E('Oyuncu artık serbest değil.','Player is no longer a free agent.');
+    const ex=aucOf(a.pid);if(ex)return OK('Bu oyuncu zaten açık artırmada.','Already at auction.',{aid:ex.id});
+    const A=newAuction(a.pid,-1,signBonus(q,U),2,true);return OK('Açık artırma açıldı, teklifini ver!','Auction opened — place your bid!',{aid:A.id})}
+  case 'list':{const q=G.P[a.pid];if(!q||!U.p.includes(a.pid))return E('Oyuncu bulunamadı.','Player not found.');if(aucOf(a.pid))return E('Zaten satışta.','Already listed.');
+    if(U.p.length<=8)return E('Kadroda en az 8 oyuncu kalmalı.','Keep at least 8 players.');
+    const pr=Math.round(+a.price||0),d=[1,2,3].includes(a.days)?a.days:2;if(!(pr>=1000&&pr<=1e9))return E('Geçersiz başlangıç fiyatı.','Invalid start price.');
+    newAuction(a.pid,U.id,pr,d,true);addNews(U.id,`📤 <b>${esc(q.n)}</b> açık artırmaya çıkarıldı (başlangıç ${money(pr)}, ${d} gün).`,`📤 <b>${esc(q.n)}</b> listed for auction (start ${money(pr)}, ${d} days).`);
+    return OK('Açık artırmaya çıkarıldı','Listed for auction')}
+  case 'cancel':{const A=G.auc.find(x=>x.id===a.aid);if(!A||A.seller!==U.id)return E('Açık artırma bulunamadı.','Auction not found.');if(A.lt!=null)return E('Teklif gelmiş açık artırma iptal edilemez.','Can\'t cancel once bids are in.');
+    G.auc=G.auc.filter(x=>x!==A);return OK('Satış iptal edildi','Listing cancelled')}
+  case 'rename':{const v=String(a.name||'').replace(/[<>&"'`\\]/g,'').replace(/\s+/g,' ').trim();if(v.length<3||v.length>28)return E('Takım adı 3-28 karakter olmalı.','Team name must be 3-28 characters.');
+    if(G.teams.some(t=>t&&t!==U&&t.c===U.c&&t.name.toLocaleLowerCase('tr')===v.toLocaleLowerCase('tr')))return E('Bu ülkede bu isimde bir takım var.','A club with that name exists in this country.');
+    U.name=v;return OK('Takım adı güncellendi','Team renamed')}
+  case 'cand':{const N=G.nat;if(N.coach[U.c]===U.id)return E('Zaten milli takım hocasısın.','You already coach the national team.');M.cand=true;return OK('Adaylığın alındı, seçim sezon sonunda.','You are a candidate — vote at season end.')}
+  case 'nat':{const N=G.nat,ci=U.c;if(N.coach[ci]!==U.id)return E('Milli takım hocası değilsin.','You are not the national coach.');
+    const pool=new Set((N.pool[ci]||[]).concat(N.sq[ci]||[]));
+    if(a.usq!=null){if(!Array.isArray(a.usq))return E('Geçersiz kadro.','Invalid squad.');const s=[...new Set(a.usq)].filter(x=>pool.has(x));if(s.length<8||s.length>12)return E('Milli kadro 8-12 oyuncu olmalı.','National squad must have 8-12 players.');N.usq[ci]=s}
+    if(a.utac!=null){const ids=N.usq[ci]||N.sq[ci]||[];N.utac[ci]=sanitizeOrders({p:ids,y:[]},{tactics:a.utac}).tac}
+    return OK('Milli takım ayarları kaydedildi ✓','National team settings saved ✓')}
+  }
+  return E('Bilinmeyen işlem.','Unknown action.')}
+
+/* ---------- sıkıştırma (gzip + base64) ---------- */
+async function zEnc(obj){const s=new Blob([JSON.stringify(obj)]).stream().pipeThrough(new CompressionStream('gzip'));const b=new Uint8Array(await new Response(s).arrayBuffer());
+  let out='';for(let i=0;i<b.length;i+=0x8000)out+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(out)}
+async function zDec(z){const bin=atob(z),b=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)b[i]=bin.charCodeAt(i);
+  const s=new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'));return JSON.parse(await new Response(s).text())}
 
 /* ================= ARAYÜZ ================= */
 function render(){
@@ -839,7 +902,7 @@ function aucRows(list){
 function transfer(){
   const U=G.teams[G.user],v=UI.trv||'auc';
   const tabs=`<div class="row" style="gap:4px;margin-bottom:12px">${[['auc','🔨 '+L('Açık Artırmalar','Auctions')+` (${G.auc.length})`],['mine','⭐ '+L('Tekliflerim & satışlarım','My bids & sales')+` (${G.auc.filter(a=>a.um>0||a.seller===G.user).length})`],['fa','🆓 '+L('Serbest Oyuncular','Free Agents')]].map(([k,t])=>`<button class="${v===k?'pri':''}" onclick="UI.trv='${k}';render()">${t}</button>`).join('')}</div>`;
-  const info=`<div class="card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between"><div><b>${L('Nasıl çalışır?','How it works')}</b> <span class="mut">${L('Teklifine ödemeye razı olduğun EN YÜKSEK tutarı yaz. Sistem seni otomatik olarak, rakip teklifin sadece bir adım üstüne çıkarır. Fiyat, limitine kadar kendiliğinden yükselir. Açık artırma bitince en yüksek limit kazanır, ödemeyi o anki fiyattan yapar. Gerçek oyunda süreler saatle olacak ve son dakikada gelen teklif süreyi uzatacak.','Enter the MAXIMUM you are willing to pay. The system bids for you, just one step above rivals, up to your limit. When the auction ends the highest limit wins and pays the current price. In the live game durations will be in hours and late bids will extend the timer.')}</span></div>
+  const info=`<div class="card" style="margin-bottom:12px"><div class="row" style="justify-content:space-between"><div><b>${L('Nasıl çalışır?','How it works')}</b> <span class="mut">${L('Teklifine ödemeye razı olduğun EN YÜKSEK tutarı yaz. Sistem seni otomatik olarak, rakip teklifin sadece bir adım üstüne çıkarır. Fiyat, limitine kadar kendiliğinden yükselir. Açık artırma bitince en yüksek limit kazanır, ödemeyi o anki fiyattan yapar. Açık artırmalar her akşamki maç gününde (20:00) biter; kalan gün sayısı maç günü sayısıdır.','Enter the MAXIMUM you are willing to pay. The system bids for you, just one step above rivals, up to your limit. When the auction ends the highest limit wins and pays the current price. Auctions end at the nightly matchday (20:00); remaining days are matchdays.')}</span></div>
    <div class="mut" style="white-space:nowrap">${L('Kasa','Cash')} <b class="or">${money(G.money)}</b> · ${L('Bağlı','Committed')} <b>${money(committed(G.user))}</b> · ${L('Kadro','Roster')} <b>${U.p.length}/${MAX_ROSTER}</b></div></div></div>`;
   if(v==='fa'){let Ls=G.fa.map(id=>G.P[id]);if(UI.faPos)Ls=Ls.filter(p=>p.pos===UI.faPos);if(UI.faC!=='')Ls=Ls.filter(p=>p.nat===+UI.faC);Ls.sort((a,b)=>b.o-a.o);Ls=Ls.slice(0,60);
     return tabs+info+`<div class="card"><div class="row" style="justify-content:space-between"><h3>${L('Serbest Oyuncular','Free Agents')}</h3><div class="row">
@@ -1407,21 +1470,29 @@ async function doClaim(){const un=document.getElementById('un').value.trim();if(
 
 /* ---------- dünyayı yükleme (günde bir değişir; tarayıcıda önbelleğe alınır) ---------- */
 const WCACHE={open(){return new Promise(res=>{const to=setTimeout(()=>res(null),2000);try{const r=indexedDB.open('hoopwall-online',1);r.onupgradeneeded=()=>r.result.createObjectStore('w');r.onsuccess=()=>{clearTimeout(to);res(r.result)};r.onerror=()=>{clearTimeout(to);res(null)}}catch(e){clearTimeout(to);res(null)}})},
-  async get(){const db=await this.open();if(!db)return null;return new Promise(res=>{try{const q=db.transaction('w').objectStore('w').get('world');q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)}catch(e){res(null)}})},
-  async put(v){const db=await this.open();if(!db)return;try{db.transaction('w','readwrite').objectStore('w').put(v,'world')}catch(e){}}};
+  async get(k){const db=await this.open();if(!db)return null;return new Promise(res=>{try{const q=db.transaction('w').objectStore('w').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)}catch(e){res(null)}})},
+  async put(k,v){const db=await this.open();if(!db)return;try{const st=db.transaction('w','readwrite').objectStore('w');st.put(v,k);st.delete('world')}catch(e){}}};
+/* her satır (ülke / genel) sıkıştırılmış hâliyle önbellekte durur; sadece sürümü (rev) değişenler indirilir */
+const rowDec=async e=>e.z?await zDec(e.z):JSON.parse(e.j);
 async function loadWorldClient(force){
   if(!G)app().innerHTML=shell(`<div class="card" style="margin-top:30px"><h2>⏳ ${L('Yükleniyor…','Loading…')}</h2></div>`);
-  const meta=(await sb.from('world_meta').select('*').eq('id',1).single()).data;ME.meta=meta;
-  let cache=force?null:await WCACHE.get();
-  if(!cache||cache.tick!==meta.tick||cache.season!==meta.season||cache.v!==2){
-    app().innerHTML=shell(`<div class="card" style="margin-top:30px"><h2>⏳ ${L('Dünya yükleniyor…','Loading the world…')}</h2><p class="mut">${L('20 ülke, 2240 takım. İlk açılış birkaç saniye sürebilir; sonra günde bir kez güncellenir.','20 countries, 2,240 clubs. First load takes a few seconds; afterwards it updates once a day.')}</p></div>`);
-    const [cs,gl]=await Promise.all([sb.from('world_country').select('country_id,data').order('country_id'),sb.from('world_global').select('data').eq('id',1).single()]);
-    if(cs.error||gl.error)throw new Error((cs.error||gl.error).message);
-    cache={v:2,tick:meta.tick,season:meta.season,day:meta.day,countries:cs.data.map(r=>r.data),global:gl.data.data};WCACHE.put(cache);
-  }
-  assembleWorld(meta,JSON.parse(JSON.stringify(cache.countries)),JSON.parse(JSON.stringify(cache.global)));
+  const [mr,cr,gr]=await Promise.all([sb.from('world_meta').select('*').eq('id',1).single(),sb.from('world_country').select('country_id,rev').order('country_id'),sb.from('world_global').select('rev').eq('id',1).single()]);
+  const err=mr.error||cr.error||gr.error;if(err)throw new Error(err.message);
+  const meta=mr.data;ME.meta=meta;ME.grev=gr.data.rev;
+  const ent=[],need=[];
+  for(const r of cr.data){const e=force?null:await WCACHE.get('c'+r.country_id);if(e&&e.v===3&&e.rev===r.rev)ent[r.country_id]=e;else need.push(r.country_id)}
+  let ge=force?null:await WCACHE.get('g');if(!(ge&&ge.v===3&&ge.rev===gr.data.rev))ge=null;
+  if(need.length>4&&!G)app().innerHTML=shell(`<div class="card" style="margin-top:30px"><h2>⏳ ${L('Dünya yükleniyor…','Loading the world…')}</h2><p class="mut">${L('20 ülke, 2240 takım. İlk açılış birkaç saniye sürebilir; sonra sadece değişen kısımlar indirilir.','20 countries, 2,240 clubs. First load takes a few seconds; afterwards only changes are downloaded.')}</p></div>`);
+  const jobs=[];
+  if(need.length)jobs.push(sb.from('world_country').select('country_id,rev,z,data').in('country_id',need).then(({data,error})=>{if(error)throw new Error(error.message);
+    for(const r of data){const e={v:3,rev:r.rev,z:r.z||null,j:r.z?null:JSON.stringify(r.data)};ent[r.country_id]=e;WCACHE.put('c'+r.country_id,e)}}));
+  if(!ge)jobs.push(sb.from('world_global').select('rev,z,data').eq('id',1).single().then(({data,error})=>{if(error)throw new Error(error.message);
+    ge={v:3,rev:data.rev,z:data.z||null,j:data.z?null:JSON.stringify(data.data)};WCACHE.put('g',ge)}));
+  await Promise.all(jobs);
+  const cd=await Promise.all(ent.map(rowDec)),gl=await rowDec(ge);
+  assembleWorld(meta,cd,gl);
   G.user=ME.profile.team_id;const U=myTeam();
-  if(!U||!U.m||U.m.uid!==ME.user.id){if(!force)return loadWorldClient(true);throw new Error('team')}
+  if(!U||!U.m||U.m.uid!==ME.user.id){if(!force){ME.profile=(await sb.from('profiles').select('*').eq('id',ME.user.id).maybeSingle()).data||ME.profile;return loadWorldClient(true)}throw new Error('team')}
   ['money','builds','board','ach','club','rec','streak','trLog','boxes'].forEach(k=>Object.defineProperty(G,k,{get(){return myTeam().m[k]},set(v){myTeam().m[k]=v},configurable:true}));
   Object.defineProperty(U,'tr',{get(){return U.m.tr},set(v){U.m.tr=v},configurable:true});
   const ord=(await sb.from('team_orders').select('tactics,training').eq('team_id',U.id).maybeSingle()).data;
@@ -1441,13 +1512,44 @@ async function sendWall(){const el=document.getElementById('wallIn');const v=(el
 
 /* ---------- emirler (taktik + antrenman) sunucuya kaydedilir ---------- */
 let _ost=null;
-function save(){clearTimeout(_ost);_ost=setTimeout(async()=>{const U=myTeam();if(!U)return;
+async function saveNow(quiet){const U=myTeam();if(!U)return;
   const {error}=await sb.from('team_orders').upsert({team_id:U.id,user_id:ME.user.id,tactics:U.tac,training:U.m.tr,updated_at:new Date().toISOString()});
-  toast(error?L('Kaydedilemedi: ','Save failed: ')+error.message:L('Kaydedildi ✓ (bir sonraki maç gününde uygulanır)','Saved ✓ (applies from the next matchday)'))},700)}
-/* henüz sunucuya bağlanmayan işlemler */
-function act(){soon()}
-function placeBid(){soon()} function startFA(){soon()} function listPlayer(){soon()} function cancelListing(){soon()}
-function natCand(){soon()} function natToggle(){soon()} function setNatTac(){soon()} function renameTeam(){soon()}
+  if(error)toast(L('Kaydedilemedi: ','Save failed: ')+error.message);else if(!quiet)toast(L('Kaydedildi ✓ (bir sonraki maç gününde uygulanır)','Saved ✓ (applies from the next matchday)'))}
+function save(){clearTimeout(_ost);_ost=setTimeout(()=>{_ost=null;saveNow()},700)}
+async function flushSave(){if(_ost){clearTimeout(_ost);_ost=null;await saveNow(true)}}
+
+/* ---------- işlemler: sunucuda anında uygulanır ---------- */
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function srvCall(a){for(let i=0;i<6;i++){const {data,error}=await sb.functions.invoke(FN,{body:{action:'act',a}});let d=data;
+    if(error){try{d=await error.context.json()}catch(e){d={error:error.message}}}
+    if(d&&d.error==='busy'){await wait(1500+i*500);continue}return d||{error:'?'}}
+  return {error:'busy'}}
+function actErr(d){if(d.error==='rule')return toast(L(d.msg[0],d.msg[1]));
+  toast(d.error==='busy'?L('Şu an maç günü işleniyor, birkaç dakika sonra tekrar dene.','Match day is being processed, try again in a few minutes.'):L('İşlem yapılamadı: ','Action failed: ')+d.error)}
+async function srvAct(a,opt={}){if(ME.acting)return toast(L('Önceki işlem sürüyor…','Previous action in progress…'));ME.acting=true;document.body.style.cursor='progress';
+  try{await flushSave();const d=await srvCall(a);if(d.error){actErr(d);return null}
+    await loadWorldClient();if(opt.close)closeModal();render();if(d.msg)toast(L(d.msg[0],d.msg[1]));return d}
+  catch(e){toast(L('Bağlantı hatası: ','Connection error: ')+(e.message||e));return null}
+  finally{ME.acting=false;document.body.style.cursor=''}}
+function act(type,id){const a={type,id};
+  if(type==='renew'){const el=document.getElementById('cy'+id);a.yrs=el?+el.value:2}
+  if(type==='buy'){const p=G.P[id];a.tid=p?p.t:null}
+  if(type==='release'||type==='yrelease'){const p=G.P[id];if(p&&!confirm(L(`${p.n} gönderilsin mi? Bu geri alınamaz.`,`Release ${p.n}? This can't be undone.`)))return}
+  srvAct(a,{close:type==='buy'})}
+function placeBid(aid,amt){srvAct({type:'bid',aid,amt:+amt})}
+async function startFA(pid){closeModal();const d=await srvAct({type:'fa',pid});
+  if(d){UI.trv='auc';UI.aucOnly='';render();setTimeout(()=>{const el=document.getElementById('bid'+d.aid);if(el){el.scrollIntoView({block:'center'});el.focus()}},60)}}
+function listPlayer(pid){const pr=+document.getElementById('lpPrice').value,dd=+document.getElementById('lpDays').value;srvAct({type:'list',pid,price:pr,days:dd},{close:true})}
+function cancelListing(aid){srvAct({type:'cancel',aid})}
+function renameTeam(){const el=document.getElementById('rn'),v=(el&&el.value||'').trim();if(v.length<3)return toast(L('En az 3 harf','At least 3 letters'));srvAct({type:'rename',name:v})}
+function natCand(){srvAct({type:'cand'})}
+/* milli takım: ekranda hemen değişir, sunucuya kısa bir gecikmeyle gönderilir */
+let _nst=null;
+function natSave(){clearTimeout(_nst);_nst=setTimeout(async()=>{_nst=null;const ci=myTeam().c,N=G.nat;
+  const d=await srvCall({type:'nat',usq:N.usq[ci]||null,utac:N.utac[ci]||null});if(d.error){actErr(d);await loadWorldClient();render()}else toast(L(d.msg[0],d.msg[1]))},900)}
+function natToggle(pid){const N=G.nat,ci=myTeam().c;if(N.coach[ci]!==G.user)return;if(!N.usq[ci])N.usq[ci]=N.sq[ci].slice();const s=N.usq[ci],i=s.indexOf(pid);
+  if(i>=0){if(s.length<=8)return toast(L('En az 8 oyuncu','At least 8 players'));s.splice(i,1)}else{if(s.length>=12)return toast(L('Kadro en fazla 12','Max 12 players'));s.push(pid)}natSave();render()}
+function setNatTac(k,v){const N=G.nat,ci=myTeam().c;if(N.coach[ci]!==G.user)return;if(!N.utac[ci])N.utac[ci]=copy(DEF_TAC);N.utac[ci][k]=v;natSave();render()}
 function go(){}
 
 /* ---------- üst çubuk: sıradaki maç günü ---------- */
@@ -1455,8 +1557,11 @@ function nextMatchAt(){const h=(ME.meta&&ME.meta.match_hour_utc)??17,n=new Date(
 function onlineHeader(){const t=nextMatchAt(),ms=t-new Date(),hh=Math.floor(ms/36e5),mm=Math.floor(ms%36e5/6e4);
   const loc=t.toLocaleTimeString(LANG==='tr'?'tr-TR':'en-GB',{hour:'2-digit',minute:'2-digit'});
   return `<span class="pill" title="${L('Maç günleri her gün bu saatte otomatik oynanır','Matchdays play automatically at this time every day')}">⏱ ${G.day>=DAYS?L('Sezon sonu','Off-season'):L('Maç günü','Matchday')} ${loc} · ${hh} ${L('sa','h')} ${mm} ${L('dk','m')}</span><span class="pill">👤 ${esc(ME.profile.username||'')}</span><button class="sm" onclick="logout()">${L('Çıkış','Sign out')}</button>`}
-async function checkUpdate(){if(!G||!ME.meta)return;const m=(await sb.from('world_meta').select('tick,season,day').eq('id',1).single()).data;
-  if(m&&(m.tick!==ME.meta.tick||m.season!==ME.meta.season)){await loadWorldClient();toast(L('🏀 Yeni maç günü oynandı!','🏀 A new matchday has been played!'));render();if(UI.live&&G.boxes.length)openLive(G.boxes[0],G.boxes.slice(1))}else{const h=document.querySelector('header .hbtn');if(h)h.innerHTML=langBtn()+onlineHeader()}}
+async function checkUpdate(){if(!G||!ME.meta||ME.acting)return;
+  const [mr,gr]=await Promise.all([sb.from('world_meta').select('tick,season,day').eq('id',1).single(),sb.from('world_global').select('rev').eq('id',1).single()]);const m=mr.data;
+  if(m&&(m.tick!==ME.meta.tick||m.season!==ME.meta.season)){await loadWorldClient();toast(L('🏀 Yeni maç günü oynandı!','🏀 A new matchday has been played!'));render();if(UI.live&&G.boxes.length)openLive(G.boxes[0],G.boxes.slice(1));return}
+  if(gr.data&&gr.data.rev!==ME.grev&&!_nst){await loadWorldClient();const ae=document.activeElement;if(['transfer','milli'].includes(UI.tab)&&!document.getElementById('ov')&&!(ae&&['INPUT','SELECT','TEXTAREA'].includes(ae.tagName)))render()}
+  const h=document.querySelector('header .hbtn');if(h)h.innerHTML=langBtn()+onlineHeader()}
 
 /* ---------- açılış ---------- */
 async function boot(){if(ME.loading)return;ME.loading=true;
